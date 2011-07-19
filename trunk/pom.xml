@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ar.com.lorekeeper</groupId>
+	<artifactId>parent-pom</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Parent Pom</name>
+	<url>http://code.google.com/p/lore-keeper</url>
+	<issueManagement>
+		<system>Google Code</system>
+		<url>http://code.google.com/p/lore-keeper/issues</url>
+	</issueManagement>
+	<inceptionYear>2011</inceptionYear>
+	<scm>
+		<url>http://lore-keeper.googlecode.com/svn</url>
+	</scm>
+  <modules>
+    <module>web-app</module>
+  </modules>
+</project>
