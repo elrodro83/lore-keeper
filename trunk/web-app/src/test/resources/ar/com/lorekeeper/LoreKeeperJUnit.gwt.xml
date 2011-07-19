@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='ar.com.lorekeeper.LoreKeeper' />
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/LoreKeeper/greet" class="ar.com.lorekeeper.server.GreetingServiceImpl" />
+
+</module>
