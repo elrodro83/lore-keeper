@@ -1,0 +1,9 @@
+<module rename-to="LoreKeeper">
+    <inherits name="com.google.gwt.user.User" />
+    <inherits name='com.google.web.bindery.requestfactory.RequestFactory' />
+
+    <entry-point class="ar.com.lorekeeper.client.LoreKeeper" />
+
+    <source path="client"/>
+    <source path="shared"/>
+</module>
