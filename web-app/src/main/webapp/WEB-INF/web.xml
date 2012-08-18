@@ -5,11 +5,20 @@
 
 <web-app>
 
-  <!-- Servlets -->
+	<!-- Servlets -->
+	<servlet>
+		<servlet-name>requestFactoryServlet</servlet-name>
+		<servlet-class>com.google.web.bindery.requestfactory.server.RequestFactoryServlet</servlet-class>
+	</servlet>
 
-  <!-- Default page to serve -->
-  <welcome-file-list>
-    <welcome-file>LoreKeeper.html</welcome-file>
-  </welcome-file-list>
+	<servlet-mapping>
+		<servlet-name>requestFactoryServlet</servlet-name>
+		<url-pattern>/gwtRequest</url-pattern>
+	</servlet-mapping>
+
+	<!-- Default page to serve -->
+	<welcome-file-list>
+		<welcome-file>LoreKeeper.html</welcome-file>
+	</welcome-file-list>
 
 </web-app>
