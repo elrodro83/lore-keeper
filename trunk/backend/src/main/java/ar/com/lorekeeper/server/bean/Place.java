@@ -4,22 +4,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Place extends PersistentObject {
-	
+
 	private String name;
-	
+
 	private String description;
-	
-	private Set<Place> children = new HashSet<Place>();
-	
+
+	private final Set<Place> children = new HashSet<Place>();
+
 	private Place parent;
-	
+
 	private GeographyCoordinate geographyCoordinate;
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -27,11 +27,11 @@ public class Place extends PersistentObject {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
-	public void addChild(Place child) {
+	public void addChild(final Place child) {
 		children.add(child);
 		child.setParent(this);
 	}
@@ -40,16 +40,23 @@ public class Place extends PersistentObject {
 		return parent;
 	}
 
-	protected void setParent(Place parent) {
+	protected void setParent(final Place parent) {
 		this.parent = parent;
 	}
 
-	public boolean isInside(Place where) {
-		if(this.parent == null) {
+	public boolean isInside(final Place where) {
+		if (this.parent == null) {
 			return false;
 		} else {
 			return this.parent.equals(where) || this.parent.isInside(where);
 		}
 	}
-	
+
+	public Object getId() {
+		return getName();
+	}
+
+	public long getVersion() {
+		return 0;
+	}
 }

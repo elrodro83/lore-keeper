@@ -7,15 +7,15 @@ import ar.com.lorekeeper.server.bean.Place;
 
 public class PlaceService {
 
-	List<Place> findAllPlaces() {
+	public static List<Place> findAllPlaces() {
 		return Collections.emptyList();
 	}
 
-	void persist(Place place) {
+	public static void persist(final Place place) {
 
 	}
 
-	void remove(Place place) {
+	public static void remove(final Place place) {
 
 	}
 
