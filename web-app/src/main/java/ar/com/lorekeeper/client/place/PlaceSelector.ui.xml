@@ -1,0 +1,13 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+    xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+    
+    <g:HTMLPanel>
+        <!-- TODO: put some type-ahead -->
+        <g:ListBox ui:field="cmbAllPlaces">
+            
+        </g:ListBox>
+        <g:Button ui:field="btnNewChild" text="New Child Place..."/>
+        <g:Button ui:field="btnNew" text="New Place..."/>
+    </g:HTMLPanel>
+    
+</ui:UiBinder>

@@ -1,0 +1,12 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+    xmlns:g='urn:import:com.google.gwt.user.client.ui' xmlns:p="urn:import:ar.com.lorekeeper.client.place">
+    
+    <g:HTMLPanel>
+        <g:Label text="What - Title"/>
+		<g:TextBox ui:field="txtWhatTitle"/>
+        <g:Label text="What - Description"/>
+		<g:TextArea ui:field="txtWhatDesc"/>
+        <g:Label text="Where"/>
+    	<p:PlaceSelector ui:field="placeSelector"/>
+    </g:HTMLPanel>
+</ui:UiBinder>

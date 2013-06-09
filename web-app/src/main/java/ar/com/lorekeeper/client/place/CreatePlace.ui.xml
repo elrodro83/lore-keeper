@@ -1,0 +1,14 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+    xmlns:g='urn:import:com.google.gwt.user.client.ui' xmlns:p="urn:import:ar.com.lorekeeper.client.place">
+    
+    <g:HTMLPanel>
+        <g:Label text="Name"/>
+		<g:TextBox ui:field="txtName"/>
+        <g:Label text="Description"/>
+		<g:TextArea ui:field="txtDesc"/>
+        <g:Label text="Is in"/>
+    	<p:PlaceSelector ui:field="parentSelector"/>
+    	<g:Button ui:field="btnCreate" text="Create"/>
+    	<g:Button ui:field="btnCancel" text="Cancel"/>
+    </g:HTMLPanel>
+</ui:UiBinder>
