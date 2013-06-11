@@ -45,7 +45,11 @@ public class PlaceSelector extends Composite {
 	}
 
 	public PlaceProxy getSelectedPlace() {
-		return places.get(cmbAllPlaces.getSelectedIndex());
+		if (places == null) {
+			return null;
+		} else {
+			return places.get(cmbAllPlaces.getSelectedIndex());
+		}
 	}
 
 	public void setSelectedPlace(final PlaceProxy place) {
