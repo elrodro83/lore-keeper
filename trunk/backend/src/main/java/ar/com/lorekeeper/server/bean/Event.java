@@ -5,9 +5,9 @@ import java.util.Date;
 public class Event extends PersistentObject {
 
 	private String what;
-	
+
 	private Place where;
-	
+
 	private Date whenFrom;
 
 	private Date whenTo;
@@ -16,7 +16,7 @@ public class Event extends PersistentObject {
 		return what;
 	}
 
-	public void setWhat(String what) {
+	public void setWhat(final String what) {
 		this.what = what;
 	}
 
@@ -24,7 +24,7 @@ public class Event extends PersistentObject {
 		return where;
 	}
 
-	public void setWhere(Place where) {
+	public void setWhere(final Place where) {
 		this.where = where;
 	}
 
@@ -32,7 +32,7 @@ public class Event extends PersistentObject {
 		return whenFrom;
 	}
 
-	public void setWhenFrom(Date whenFrom) {
+	public void setWhenFrom(final Date whenFrom) {
 		this.whenFrom = whenFrom;
 	}
 
@@ -40,11 +40,16 @@ public class Event extends PersistentObject {
 		return whenTo;
 	}
 
-	public void setWhenTo(Date whenTo) {
+	public void setWhenTo(final Date whenTo) {
 		this.whenTo = whenTo;
 	}
 
-	public boolean happenedIn(Place where) {
+	public boolean happenedIn(final Place where) {
 		return this.where.isInside(where);
+	}
+
+	@Override
+	public Object getId() {
+		return getWhat();
 	}
 }
