@@ -22,6 +22,8 @@ Would use a Lucene index with key fields from all entities.
  * Organizations?
 
 3 tabs in detail page
+
+Detail should be shown in the same way for any entity.
  * Text information
  * Timeline
  * Map
