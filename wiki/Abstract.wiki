@@ -1,0 +1,25 @@
+#summary Components and technologies to use
+
+= Introduction =
+
+GWT widgets
+
+
+= Details =
+
+GWT widgets
+
+Seach TextBox in home page
+* http://www.gwtproject.org/javadoc/latest/com/google/gwt/user/client/ui/SuggestBox.html
+* http://www.gwtproject.org/javadoc/latest/com/google/gwt/user/client/ui/SuggestOracle.html
+
+4 Big Buttons
+* Places
+* People
+* Events
+* Organizations?
+
+3 tabs in detail page
+* Text information
+* Timeline
+* Map
