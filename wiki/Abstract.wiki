@@ -13,6 +13,8 @@ Seach TextBox in home page
  * [http://www.gwtproject.org/javadoc/latest/com/google/gwt/user/client/ui/SuggestBox.html]
  * [http://www.gwtproject.org/javadoc/latest/com/google/gwt/user/client/ui/SuggestOracle.html]
 
+Would use a Lucene index with key fields from all entities.
+
 4 Big Buttons
  * Places
  * People
