@@ -25,5 +25,5 @@ Would use a Lucene index with key fields from all entities.
 
 Detail should be shown in the same way for any entity.
  * Text information
- * Timeline
+ * Timeline (http://www.simile-widgets.org/timeline/)
  * Map
