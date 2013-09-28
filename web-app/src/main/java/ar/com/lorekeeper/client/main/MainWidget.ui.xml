@@ -1,0 +1,12 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+    xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+    
+    <g:HTMLPanel>
+        <g:SuggestBox ui:field="sgbSearch"/>
+        <g:Button ui:field="btnCharacters" text="Characters"/>
+        <g:Button ui:field="btnPlaces" text="Places"/>
+        <g:Button ui:field="btnEvents" text="Events"/>
+<!--         <g:Button ui:field="btnOrganizations" text="Organizations"/> -->
+<!--         <g:Button ui:field="btnObjects" text="Objects"/> -->
+    </g:HTMLPanel>
+</ui:UiBinder>
