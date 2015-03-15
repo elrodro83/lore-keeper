@@ -1,0 +1,2 @@
+Application to keep record of events in a RPG campaign, relating characters, places, objects and organizations in time.
+Provides quick access and search utilities to easily remember that lost character or forgotten dungeon.
