@@ -23,7 +23,11 @@ $dir = dirname( __FILE__ );
 $dirbasename = basename( $dir );
 
 $wgAutoloadClasses['LoreKeeper'] = $dir . '/LoreKeeper.body.php';
+$wgAutoloadClasses['Event'] = $dir . '/metadata/Event.php';
 
 $wgMessagesDirs['Example'] = __DIR__ . '/i18n';
 
 $wgHooks['ParserFirstCallInit'][] = 'LoreKeeper::onParserFirstCallInit';
+
+// Allow translation of the parser function name
+$wgExtensionMessagesFiles['LoreKeeper'] = __DIR__ . '/LoreKeeper.i18n.php';

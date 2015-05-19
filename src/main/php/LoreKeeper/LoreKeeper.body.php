@@ -3,20 +3,16 @@
 class LoreKeeper {
 	
 	public static function onParserFirstCallInit(&$parser) {
-		$parser->setHook ( 'event', 'LoreKeeper::wfEventRender' );
+		$parser->setFunctionHook ( 'event', 'LoreKeeper::wfEventRender' );
 		return true;
 	}
 	
-	public static function wfEventRender($input, array $args, Parser $parser, PPFrame $frame) {
-		$dump =  array(
-			'content' => $input,
-			'atributes' => (object)$attribs,
-		);
-
-		// Very important to escape user data with htmlspecialchars() to prevent
-		// an XSS security vulnerability.
-		$html = '<pre>Dump Tag: ' . htmlspecialchars( FormatJson::encode( $dump, /*prettyPrint=*/true ) ) . '</pre>';
-
-		return $html;
+	public static function wfEventRender( $parser ) {
+		try {
+			$parsedEvent = Event::parseEvent(func_get_args());
+			return array(Event::renderEvent($parsedEvent), 'noparse' => false, 'nowiki' => false );
+		} catch(Exception $e) {
+			return array("* '''" . htmlspecialchars($e->getMessage()) . "'''", 'noparse' => false );
+		}
 	}
 }
