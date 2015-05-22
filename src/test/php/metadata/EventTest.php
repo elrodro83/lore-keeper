@@ -2,21 +2,21 @@
 class LoreKeeperEventTest extends PHPUnit_Framework_TestCase {
 	
 	public function testEventRenderOneCharacter() {
-		$parsedEvent = Event::parseEvent([null,
+		$parsedEvent = new Event([null,
 				"who=Sauron",
 				"when=1600",
 				"where=Mount Doom",
 				"what=The One Ring",
 		]);
 		
-		$this->assertEquals("1600", $parsedEvent["when"]);
-		$this->assertEquals("Sauron", $parsedEvent["who"][0]);
-		$this->assertEquals("Mount Doom", $parsedEvent["where"]);
-		$this->assertEquals("The One Ring", $parsedEvent["what"]);
+		$this->assertEquals("1600", $parsedEvent->getWhen());
+		$this->assertEquals("Sauron", $parsedEvent->getWho()[0]);
+		$this->assertEquals("Mount Doom", $parsedEvent->getWhere());
+		$this->assertEquals("The One Ring", $parsedEvent->getWhat());
 	}
 	
 	public function testEventRenderManyCharacters() {
-		$parsedEvent = Event::parseEvent([null,
+		$parsedEvent = new Event([null,
 				"who=Sauron",
 				"who=Last Alliance",
 				"who=Gil-galad",
@@ -27,19 +27,19 @@ class LoreKeeperEventTest extends PHPUnit_Framework_TestCase {
 				"what=The One Ring",
 		]);
 		
-		$this->assertEquals("3434", $parsedEvent["when"]);
-		$this->assertEquals("Sauron", $parsedEvent["who"][0]);
-		$this->assertEquals("Last Alliance", $parsedEvent["who"][1]);
-		$this->assertEquals("Gil-galad", $parsedEvent["who"][2]);
-		$this->assertEquals("Elendil", $parsedEvent["who"][3]);
-		$this->assertEquals("Isildur", $parsedEvent["who"][4]);
-		$this->assertEquals("Barad-dûr", $parsedEvent["where"]);
-		$this->assertEquals("The One Ring", $parsedEvent["what"]);
+		$this->assertEquals("3434", $parsedEvent->getWhen());
+		$this->assertEquals("Sauron", $parsedEvent->getWho()[0]);
+		$this->assertEquals("Last Alliance", $parsedEvent->getWho()[1]);
+		$this->assertEquals("Gil-galad", $parsedEvent->getWho()[2]);
+		$this->assertEquals("Elendil", $parsedEvent->getWho()[3]);
+		$this->assertEquals("Isildur", $parsedEvent->getWho()[4]);
+		$this->assertEquals("Barad-dûr", $parsedEvent->getWhere());
+		$this->assertEquals("The One Ring", $parsedEvent->getWhat());
 	}
 
 	public function testEventRenderMissingInfo() {
 		try {
-			$parsedEvent = Event::parseEvent([null,
+			$parsedEvent = new Event([null,
 				"who=Sauron",
 				"who=Last Alliance",
 				"who=Gil-galad",
@@ -57,7 +57,7 @@ class LoreKeeperEventTest extends PHPUnit_Framework_TestCase {
 
 	public function testEventRenderEmptyWho() {
 		try {
-			$parsedEvent = Event::parseEvent([null,
+			$parsedEvent = new Event([null,
 // 				"who=Sauron",
 // 				"who=Last Alliance",
 // 				"who=Gil-galad",

@@ -24,6 +24,7 @@ $dirbasename = basename( $dir );
 
 $wgAutoloadClasses['LoreKeeper'] = $dir . '/LoreKeeper.body.php';
 $wgAutoloadClasses['Event'] = $dir . '/metadata/Event.php';
+$wgAutoloadClasses['Timeline'] = $dir . '/metadata/Timeline.php';
 
 $wgMessagesDirs['Example'] = __DIR__ . '/i18n';
 

@@ -1,6 +1,13 @@
 <?php
 class Event {
-	public static function parseEvent($args) {
+	
+	private $title = "";
+	private $when = "";
+	private $where = "";
+	private $who = array();
+	private $what = "";
+	
+	function __construct($args) {
 		//Suppose the user invoked the parser function like so:
 		//{{#myparserfunction:foo=bar|apple=orange}}
 	
@@ -14,7 +21,7 @@ class Event {
 		//	[1] => 'apple=orange'
 	
 		//Now we need to transform $opts into a more useful form...
-		return Event::extractOptions( $opts );
+		return $this->extractOptions( $opts );
 	}
 	
 	/**
@@ -24,7 +31,7 @@ class Event {
 	 * @param array string $options
 	 * @return array $results
 	 */
-	public static function extractOptions( array $options ) {
+	public function extractOptions( array $options ) {
 		$results = array();
 	
 		foreach ( $options as $option ) {
@@ -33,12 +40,13 @@ class Event {
 				$name = trim( $pair[0] );
 				$value = trim( $pair[1] );
 				if("who" == $name) {
-					if(empty($results[$name])) {
-						$results[$name] = array();
-					}
-					array_push($results[$name], $value);
-				} else {
-					$results[$name] = $value;
+					array_push($this->who, $value);
+				} else if("when" == $name) {
+					$this->when = $value;
+				} else if("where" == $name) {
+					$this->where = $value;
+				} else if("what" == $name) {
+					$this->what = $value;
 				}
 			}
 		}
@@ -46,39 +54,72 @@ class Event {
 		//	[foo] => bar
 		//	[apple] => orange
 	
-		if(empty($results["who"])) {
+		if(empty($this->who)) {
 			throw new Exception("Missing mandatory 'who' data: " . json_encode($options));
-		} else if(empty($results["when"])) {
+		} else if(empty($this->when)) {
 			throw new Exception("Missing mandatory 'when' data: " . json_encode($options));
-		} else if(empty($results["where"])) {
+		} else if(empty($this->where)) {
 			throw new Exception("Missing mandatory 'where' data: " . json_encode($options));
 		}
 	
 		return $results;
 	}
 	
-	public static function renderEvent($parsedEvent) {
+	public static function renderEvents($parsedEvents, $showTitle = false) {
 		$markUp = "{| class=\"wikitable\"\n";
 			
+		if($showTitle) {
+			$markUp .= "! \n";
+		}
 		$markUp .= "! When\n";
 		$markUp .= "! Where\n";
 		$markUp .= "! Who\n";
-		if(!empty($parsedEvent["what"])) {
-			$markUp .= "! What\n";
-		}
+		$markUp .= "! What\n";
 			
-		$markUp .= "|-\n";
-		$markUp .= "| " . htmlspecialchars($parsedEvent["when"] . "\n");
-		$markUp .= "| " . htmlspecialchars($parsedEvent["where"] . "\n");
-		$markUp .= "|\n";
-		foreach($parsedEvent["who"] as $who) {
-			$markUp .= "* " . htmlspecialchars($who) . "\n";
-		}
-		if(!empty($parsedEvent["what"])) {
-			$markUp .= "| " . htmlspecialchars($parsedEvent["what"] . "\n");
+		foreach($parsedEvents as $parsedEvent) {
+			$markUp .= "|-\n";
+			if($showTitle) {
+				$markUp .= "! " . htmlspecialchars($parsedEvent->title) . "\n";
+			}
+			$markUp .= "| " . htmlspecialchars($parsedEvent->when) . "\n";
+			$markUp .= "| " . htmlspecialchars($parsedEvent->where) . "\n";
+			$markUp .= "|\n";
+			foreach($parsedEvent->who as $who) {
+				$markUp .= "* " . htmlspecialchars($who) . "\n";
+			}
+			if(!empty($parsedEvent->what)) {
+				$markUp .= "| " . htmlspecialchars($parsedEvent->what) . "\n";
+			} else {
+				$markUp .= "| \n";
+			}
 		}
 			
 		$markUp .= "|}";
 		return $markUp;
 	}
+
+	public function setTitle($title) {
+		$this->title = $title;
+	}
+	
+	public function getTitle() {
+		return $this->title;
+	}
+	
+	public function getWhen() {
+		return $this->when;
+	}
+	
+	public function getWhere() {
+		return $this->where;
+	}
+	
+	public function getWho() {
+		return $this->who;
+	}
+	
+	public function getWhat() {
+		return $this->what;
+	}
+	
 }
