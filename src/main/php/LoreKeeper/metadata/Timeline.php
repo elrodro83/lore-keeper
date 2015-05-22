@@ -7,7 +7,7 @@ class Timeline {
 	function __construct($parser) {
 		foreach($this->fetchBacklinkPages($parser) as $backlinkPage) {
 			$backlinkContent = $backlinkPage["revisions"][0]["*"];
-			
+
 			$rawEvents = [];
 			$subtitileEvents = [];
 			preg_match_all("/({{#event:[^}}]*}})/m", $backlinkContent, $rawEvents);
@@ -23,6 +23,13 @@ class Timeline {
 				$parsedEvent->setTitle($title . " (" . $this->resolveEventCategories($backlinkContent) . ")");
 				array_push($this->events, $parsedEvent);
 			}
+			
+// 			http://www.mediawiki.org/wiki/Manual:Tag_extensions#Regenerating_the_page_when_another_page_is_edited
+			$title = Title::newFromText( $backlinkPage["title"] );
+			$rev = Revision::newFromTitle( $title );
+			$id = $rev ? $rev->getPage() : 0;
+			// Register dependency in templatelinks
+			$parser->getOutput()->addTemplate( $title, $id, $rev ? $rev->getId() : 0 );			
 		}
 	}
 	
