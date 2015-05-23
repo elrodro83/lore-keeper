@@ -42,7 +42,7 @@ class Event {
 				if("who" == $name) {
 					array_push($this->who, $value);
 				} else if("when" == $name) {
-					$this->when = $value;
+					$this->when = new LKDate($value);
 				} else if("where" == $name) {
 					$this->where = $value;
 				} else if("what" == $name) {
@@ -81,7 +81,7 @@ class Event {
 			if($showTitle) {
 				$markUp .= "! " . htmlspecialchars($parsedEvent->title) . "\n";
 			}
-			$markUp .= "| " . htmlspecialchars($parsedEvent->when) . "\n";
+			$markUp .= "| " . htmlspecialchars($parsedEvent->when->getDateString()) . "\n";
 			$markUp .= "| " . htmlspecialchars($parsedEvent->where) . "\n";
 			$markUp .= "|\n";
 			foreach($parsedEvent->who as $who) {

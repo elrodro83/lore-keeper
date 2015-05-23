@@ -3,9 +3,19 @@
 class LoreKeeper {
 	
 	public static function onParserFirstCallInit(&$parser) {
+		$parser->setFunctionHook ( 'calendar', 'LoreKeeper::wfCalendarRender' );
 		$parser->setFunctionHook ( 'event', 'LoreKeeper::wfEventRender' );
 		$parser->setFunctionHook ( 'timeline', 'LoreKeeper::wfTimelineRender' );
 		return true;
+	}
+	
+	public static function wfCalendarRender( $parser, $months = '' , $qualifier = '' , $offset = '' ) {
+		try {
+			$parsedCalendar = new Calendar($months , $qualifier , $offset);
+			return array($parsedCalendar->render(), 'noparse' => false, 'nowiki' => false );
+		} catch(Exception $e) {
+			return array("* '''" . htmlspecialchars($e->getMessage()) . "'''", 'noparse' => false );
+		}
 	}
 	
 	public static function wfEventRender( $parser ) {

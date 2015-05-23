@@ -1,5 +1,10 @@
 <?php
 
+if ( !defined( 'MEDIAWIKI' ) ) {
+	echo( "This file is an extension to the MediaWiki software and cannot be used standalone.\n" );
+	die( 1 );
+}
+
 $wgExtensionCredits['other'][] = array(
 		'path' => __FILE__,
 
@@ -17,12 +22,15 @@ $wgExtensionCredits['other'][] = array(
 );
 
 /* Setup */
+$wgLoreKeeperCalendarPage = "Calendars";
 
 // Initialize an easy to use shortcut:
 $dir = dirname( __FILE__ );
 $dirbasename = basename( $dir );
 
 $wgAutoloadClasses['LoreKeeper'] = $dir . '/LoreKeeper.body.php';
+$wgAutoloadClasses['Calendar'] = $dir . '/metadata/Calendar.php';
+$wgAutoloadClasses['LKDate'] = $dir . '/metadata/LKDate.php';
 $wgAutoloadClasses['Event'] = $dir . '/metadata/Event.php';
 $wgAutoloadClasses['Timeline'] = $dir . '/metadata/Timeline.php';
 

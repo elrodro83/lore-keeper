@@ -31,6 +31,12 @@ class Timeline {
 			// Register dependency in templatelinks
 			$parser->getOutput()->addTemplate( $title, $id, $rev ? $rev->getId() : 0 );			
 		}
+		
+		usort($this->events, "Timeline::eventTimestampCmp");
+	}
+	
+	function eventTimestampCmp($a, $b) {
+		return $a->getWhen()->getTimestamp() - $b->getWhen()->getTimestamp();
 	}
 	
 	private function fetchBacklinkPages($parser) {
