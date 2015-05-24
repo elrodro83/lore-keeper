@@ -11,17 +11,18 @@ class Timeline {
 			$rawEvents = [];
 			$subtitileEvents = [];
 			preg_match_all("/({{#event:[^}}]*}})/m", $backlinkContent, $rawEvents);
-			preg_match_all("/(?:==+ (.+) ==+).*({{#event:[^}}]*}})/ms", $backlinkContent, $subtitileEvents);
+			preg_match_all("/(?:==+ (.+) ==+).*({{#event:[^}}]*}})/msU", $backlinkContent, $subtitileEvents);
 			
-			foreach($rawEvents[0] as $event) {
-				$title = $this->resolveEventTitle($backlinkPage["title"], $event, $subtitileEvents[2], $subtitileEvents[1]);
-				
+			foreach($rawEvents[0] as $rawEvent) {
 				$eventBody = [];
-				preg_match_all("/{{#event:([^}}]*)}}/", $event, $eventBody);
+				preg_match_all("/{{#event:([^}}]*)}}/", $rawEvent, $eventBody);
 					
 				$parsedEvent = new Event(array_merge([$parser], explode("|", $eventBody[1][0])));
-				$parsedEvent->setTitle($title . " (" . $this->resolveEventCategories($backlinkContent) . ")");
-				array_push($this->events, $parsedEvent);
+				if($parsedEvent->hasLinksTo($parser->getTitle()->getBaseTitle())) {
+					$parsedEvent->setTitle($this->resolveEventTitle($backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1])
+							. " (" . $this->resolveEventCategories($backlinkContent) . ")");
+					array_push($this->events, $parsedEvent);
+				}
 			}
 			
 // 			http://www.mediawiki.org/wiki/Manual:Tag_extensions#Regenerating_the_page_when_another_page_is_edited
@@ -35,8 +36,8 @@ class Timeline {
 		usort($this->events, "Timeline::eventTimestampCmp");
 	}
 	
-	function eventTimestampCmp($a, $b) {
-		return $a->getWhen()->getTimestamp() - $b->getWhen()->getTimestamp();
+	function eventTimestampCmp($eventA, $eventB) {
+		return $eventA->getWhen()->getTimestamp() - $eventB->getWhen()->getTimestamp();
 	}
 	
 	private function fetchBacklinkPages($parser) {

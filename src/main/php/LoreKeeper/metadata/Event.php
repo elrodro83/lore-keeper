@@ -65,6 +65,17 @@ class Event {
 		return $results;
 	}
 	
+	public function hasLinksTo($pageTile) {
+		foreach($this->who as $character) {
+			if(preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $character)) {
+				return true;
+			}
+		}
+		
+		return preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $this->where)
+			|| preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $this->what);
+	}
+	
 	public static function renderEvents($parsedEvents, $showTitle = false) {
 		$markUp = "{| class=\"wikitable\"\n";
 			
