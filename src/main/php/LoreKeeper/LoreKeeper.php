@@ -19,6 +19,7 @@ $wgExtensionCredits['other'][] = array(
 
 		# Key name of the message containing the description.
 		'descriptionmsg' => 'lorekeeper-desc',
+		'license-name'   => 'GPL-3.0+'
 );
 
 /* Setup */
@@ -30,6 +31,7 @@ $dirbasename = basename( $dir );
 
 $wgAutoloadClasses['LoreKeeper'] = $dir . '/LoreKeeper.body.php';
 $wgAutoloadClasses['Calendar'] = $dir . '/metadata/Calendar.php';
+$wgAutoloadClasses['InPageCalendar'] = $dir . '/metadata/InPageCalendar.php';
 $wgAutoloadClasses['LKDate'] = $dir . '/metadata/LKDate.php';
 $wgAutoloadClasses['Event'] = $dir . '/metadata/Event.php';
 $wgAutoloadClasses['Timeline'] = $dir . '/metadata/Timeline.php';
