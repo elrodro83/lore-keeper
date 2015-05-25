@@ -2,5 +2,9 @@
     "@metadata": {
         "authors": []
     },
-    "lorekeeper-desc": "{{desc}}"
+    "lorekeeper-desc": "{{desc}}",
+	"who": "{{who}}",
+	"what": "{{what}}",
+	"when": "{{when}}",
+	"where": "{{where}}"
 }

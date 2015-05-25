@@ -82,10 +82,10 @@ class Event {
 		if($showTitle) {
 			$markUp .= "! \n";
 		}
-		$markUp .= "! When\n";
-		$markUp .= "! Where\n";
-		$markUp .= "! Who\n";
-		$markUp .= "! What\n";
+		$markUp .= "! " . wfMessage("when") . "\n";
+		$markUp .= "! " . wfMessage("where") . "\n";
+		$markUp .= "! " . wfMessage("who") . "\n";
+		$markUp .= "! " . wfMessage("what") . "\n";
 			
 		foreach($parsedEvents as $parsedEvent) {
 			$markUp .= "|-\n";

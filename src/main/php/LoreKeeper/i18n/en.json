@@ -2,5 +2,9 @@
     "@metadata": {
         "authors": []
     },
-    "lorekeeper-desc": "Build RPG reports for event articles."
+    "lorekeeper-desc": "Build story reports from articles that describe events.",
+	"who": "Who",
+	"what": "What",
+	"when": "When",
+	"where": "Where"
 }

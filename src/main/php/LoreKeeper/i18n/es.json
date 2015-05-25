@@ -1,0 +1,10 @@
+{
+    "@metadata": {
+        "authors": []
+    },
+    "lorekeeper-desc": "Construye reportes de historias a partir de artículos que describen eventos.",
+	"who": "Quién",
+	"what": "Qué",
+	"when": "Cuándo",
+	"where": "Dónde"
+}
