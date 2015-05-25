@@ -24,3 +24,11 @@ The wiki must have a *Calendars* page where the rules for parsing the *when* att
 * The first attribute is an enumeration of the months, with hoe long each one lasts.
 * The second is the definition of the calendar. In this case it indicates that this is the Elf calendar for the 2nd age.
 * The third one is the offset in days between the beginning of the era and the "epoch". For this example, I defined the epoch as being the start of the second age, so i put as the offset the negative duration in days of the First Age. This parameter allows for the creation of timelines composed of events that may have its dates based on different calendars.
+
+## Disclaimer
+
+### About example data
+
+Examples and test data are taken from [The One Wiki to Rule Them All](http://lotr.wikia.com/wiki/Main_Page).
+LoreKeeper mediawiki extension is Not in any way, shape, or form affiliated with [The One Wiki to Rule Them All](http://lotr.wikia.com/wiki/Main_Page), [Saul Zaentz](http://www.zaentz.com/), [Middle-earth Enterprises](http://www.middleearth.com/home.html), or the Tolkien Estate.
+Copyrights and trademarks for the books, films, and other promotional materials are held by their respective owners and their use is allowed under the fair use clause of the Copyright Law.
