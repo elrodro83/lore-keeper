@@ -1,5 +1,11 @@
 # lore-keeper
-MediaWiki extension for managing and presenting historical/fictional stories
+[MediaWiki](https://www.mediawiki.org/wiki/MediaWiki) extension for managing and presenting historical/fictional stories
+
+## Installation
+
+Follow the instructions on [https://www.mediawiki.org/wiki/Manual:Extensions#Installing_an_extension] (skip step 1, there are no unix commands required). You need to copy the folder src/main/php/LoreKeeper into the extensions dir.
+
+## Usage
 
 This extension will parse event metadata from wiki pages. That metadata will contain information of the event such as:
 * when it happened
@@ -31,4 +37,5 @@ The wiki must have a *Calendars* page where the rules for parsing the *when* att
 
 Examples and test data are taken from [The One Wiki to Rule Them All](http://lotr.wikia.com/wiki/Main_Page).
 LoreKeeper mediawiki extension is Not in any way, shape, or form affiliated with [The One Wiki to Rule Them All](http://lotr.wikia.com/wiki/Main_Page), [Saul Zaentz](http://www.zaentz.com/), [Middle-earth Enterprises](http://www.middleearth.com/home.html), or the Tolkien Estate.
+
 Copyrights and trademarks for the books, films, and other promotional materials are held by their respective owners and their use is allowed under the fair use clause of the Copyright Law.
