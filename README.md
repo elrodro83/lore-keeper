@@ -3,7 +3,7 @@
 
 ## Installation
 
-Follow the instructions on [https://www.mediawiki.org/wiki/Manual:Extensions#Installing_an_extension] (skip step 1, there are no unix commands required). You need to copy the folder src/main/php/LoreKeeper into the extensions dir.
+Follow the [https://www.mediawiki.org/wiki/Manual:Extensions#Installing_an_extension](instructions). Skip step 1, there are no unix commands required. You need to copy the folder *src/main/php/LoreKeeper* into the extensions dir.
 
 ## Usage
 
@@ -19,9 +19,9 @@ Event pages should contain some markup to be processed by the extension, for ins
 
 Then, from a page for a character or a place that includes the markup (Sauron, for instance):
     
-    {{timeline:}}
+    {{#timeline:}}
     
-, the extension will query the pages with event tags that reference the object of the page. Once that data is fetched, it will be used for generating timelines (biographies for characters, history for places) using the timeline component: [https://github.com/NUKnightLab/TimelineJS].
+, the extension will query the pages with event tags that reference the object of the page. Once that data is fetched, it will be used for generating timelines (biographies for characters, history for places) using the [timeline component](https://github.com/NUKnightLab/TimelineJS).
 
 The wiki must have a *Calendars* page where the rules for parsing the *when* attribute are defined:
 
