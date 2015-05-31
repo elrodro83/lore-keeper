@@ -17,7 +17,9 @@ class Timeline {
 				$eventBody = [];
 				preg_match_all("/{{#event:([^}}]*)}}/", $rawEvent, $eventBody);
 					
-				$parsedEvent = new Event(array_merge([$parser], explode("|", $eventBody[1][0])));
+				$parsedEvent = new Event(array_merge([$parser],
+						preg_split("/\|(?=when|what|where|who)/",
+								str_replace(array("\r\n", "\n", "\r"), "", $eventBody[1][0]))));
 				if($parsedEvent->hasLinksTo($parser->getTitle()->getBaseTitle())) {
 					$parsedEvent->setTitle($this->resolveEventTitle($backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1])
 							. " (" . $this->resolveEventCategories($backlinkContent) . ")");

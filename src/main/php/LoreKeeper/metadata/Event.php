@@ -5,7 +5,7 @@ class Event {
 	private $when = "";
 	private $where = "";
 	private $who = array();
-	private $what = "";
+	private $what = array();
 	
 	function __construct($args) {
 		//Suppose the user invoked the parser function like so:
@@ -46,7 +46,7 @@ class Event {
 				} else if("where" == $name) {
 					$this->where = $value;
 				} else if("what" == $name) {
-					$this->what = $value;
+					array_push($this->what, $value);
 				}
 			}
 		}
@@ -54,9 +54,7 @@ class Event {
 		//	[foo] => bar
 		//	[apple] => orange
 	
-		if(empty($this->who)) {
-			throw new Exception("Missing mandatory 'who' data: " . json_encode($options));
-		} else if(empty($this->when)) {
+		if(empty($this->when)) {
 			throw new Exception("Missing mandatory 'when' data: " . json_encode($options));
 		} else if(empty($this->where)) {
 			throw new Exception("Missing mandatory 'where' data: " . json_encode($options));
@@ -67,13 +65,17 @@ class Event {
 	
 	public function hasLinksTo($pageTile) {
 		foreach($this->who as $character) {
-			if(preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $character)) {
+			if(preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $character) > 0) {
+				return true;
+			}
+		}
+		foreach($this->what as $item) {
+			if(preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $item) > 0) {
 				return true;
 			}
 		}
 		
-		return preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $this->where)
-			|| preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $this->what);
+		return preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $this->where) > 0;
 	}
 	
 	public static function renderEvents($parsedEvents, $showTitle = false) {
@@ -90,19 +92,19 @@ class Event {
 		foreach($parsedEvents as $parsedEvent) {
 			$markUp .= "|-\n";
 			if($showTitle) {
-				$markUp .= "! " . htmlspecialchars($parsedEvent->title) . "\n";
+				$markUp .= "! " . $parsedEvent->title . "\n";
 			}
-			$markUp .= "| " . htmlspecialchars($parsedEvent->when->getDateString()) . "\n";
-			$markUp .= "| " . htmlspecialchars($parsedEvent->where) . "\n";
+			$markUp .= "| " . $parsedEvent->when->getDateString() . "\n";
+			$markUp .= "| " . $parsedEvent->where . "\n";
 			$markUp .= "|\n";
 			foreach($parsedEvent->who as $who) {
-				$markUp .= "* " . htmlspecialchars($who) . "\n";
+				$markUp .= "* " . $who . "\n";
 			}
-			if(!empty($parsedEvent->what)) {
-				$markUp .= "| " . htmlspecialchars($parsedEvent->what) . "\n";
-			} else {
-				$markUp .= "| \n";
+			$markUp .= "|\n";
+			foreach($parsedEvent->what as $what) {
+				$markUp .= "* " . $what . "\n";
 			}
+			$markUp .= "\n";
 		}
 			
 		$markUp .= "|}";
