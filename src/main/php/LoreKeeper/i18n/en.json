@@ -3,6 +3,7 @@
         "authors": []
     },
     "lorekeeper-desc": "Build story reports from articles that describe events.",
+	"categories": "Categories",
 	"who": "Who",
 	"what": "What",
 	"when": "When",

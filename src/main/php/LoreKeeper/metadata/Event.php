@@ -2,6 +2,7 @@
 class Event {
 	
 	private $title = "";
+	private $categories = array();
 	private $when = "";
 	private $where = "";
 	private $who = array();
@@ -83,6 +84,7 @@ class Event {
 			
 		if($showTitle) {
 			$markUp .= "! \n";
+			$markUp .= "! " . wfMessage("categories") . "\n";
 		}
 		$markUp .= "! " . wfMessage("when") . "\n";
 		$markUp .= "! " . wfMessage("where") . "\n";
@@ -92,17 +94,21 @@ class Event {
 		foreach($parsedEvents as $parsedEvent) {
 			$markUp .= "|-\n";
 			if($showTitle) {
-				$markUp .= "! " . $parsedEvent->title . "\n";
+				$markUp .= "| $parsedEvent->title\n";
+				$markUp .= "| \n";
+				foreach($parsedEvent->categories as $category) {
+					$markUp .= "* [[:Category:$category|$category]]\n";
+				}
 			}
 			$markUp .= "| " . $parsedEvent->when->getDateString() . "\n";
-			$markUp .= "| " . $parsedEvent->where . "\n";
+			$markUp .= "| $parsedEvent->where\n";
 			$markUp .= "|\n";
 			foreach($parsedEvent->who as $who) {
-				$markUp .= "* " . $who . "\n";
+				$markUp .= "* $who\n";
 			}
 			$markUp .= "|\n";
 			foreach($parsedEvent->what as $what) {
-				$markUp .= "* " . $what . "\n";
+				$markUp .= "* $what\n";
 			}
 			$markUp .= "\n";
 		}
@@ -113,6 +119,10 @@ class Event {
 
 	public function setTitle($title) {
 		$this->title = $title;
+	}
+	
+	public function setCategories($categories) {
+		$this->categories = $categories;
 	}
 	
 	public function getTitle() {

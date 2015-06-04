@@ -11,7 +11,7 @@ class Timeline {
 			$rawEvents = [];
 			$subtitileEvents = [];
 			preg_match_all("/({{#event:[^}}]*}})/m", $backlinkContent, $rawEvents);
-			preg_match_all("/(?:==+ (.+) ==+).*({{#event:[^}}]*}})/msU", $backlinkContent, $subtitileEvents);
+			preg_match_all("/==+ ([^==+]+) ==+[^==+]*({{#event:[^}}]*}})/", $backlinkContent, $subtitileEvents);
 			
 			foreach($rawEvents[0] as $rawEvent) {
 				$eventBody = [];
@@ -21,8 +21,8 @@ class Timeline {
 						preg_split("/\|(?=when|what|where|who)/",
 								str_replace(array("\r\n", "\n", "\r"), "", $eventBody[1][0]))));
 				if($parsedEvent->hasLinksTo($parser->getTitle()->getBaseTitle())) {
-					$parsedEvent->setTitle($this->resolveEventTitle($backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1])
-							. " (" . $this->resolveEventCategories($backlinkContent) . ")");
+					$parsedEvent->setTitle($this->resolveEventTitle($backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1]));
+					$parsedEvent->setCategories($this->resolveEventCategories($backlinkContent));
 					array_push($this->events, $parsedEvent);
 				}
 			}
@@ -89,12 +89,12 @@ class Timeline {
 		$categories = [];
 		preg_match_all("/\[\[[cC]ategory:([^\]\]]*)\]\]/m", $backlinkContent, $categories);
 		
-		$cat = "";
+		$cats = array();
 		foreach($categories[1] as $category) {
-			$cat .= "[[:Category:" . $category . "|" . $category . "]], ";
+			array_push($cats, $category);
 		}
 		
-		return substr($cat, 0, -2);
+		return $cats;
 	}
 
 	public function getEvents() {
