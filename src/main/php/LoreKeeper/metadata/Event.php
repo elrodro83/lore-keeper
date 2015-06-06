@@ -22,7 +22,7 @@ class Event {
 		//	[1] => 'apple=orange'
 	
 		//Now we need to transform $opts into a more useful form...
-		return $this->extractOptions( $opts );
+		$this->extractOptions( $opts );
 	}
 	
 	/**
@@ -33,8 +33,6 @@ class Event {
 	 * @return array $results
 	 */
 	public function extractOptions( array $options ) {
-		$results = array();
-	
 		foreach ( $options as $option ) {
 			$pair = explode( '=', $option, 2 );
 			if ( count( $pair ) == 2 ) {
@@ -60,23 +58,21 @@ class Event {
 		} else if(empty($this->where)) {
 			throw new Exception("Missing mandatory 'where' data: " . json_encode($options));
 		}
-	
-		return $results;
 	}
 	
 	public function hasLinksTo($pageTile) {
 		foreach($this->who as $character) {
-			if(preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $character) > 0) {
+			if(preg_match("/\[\[$pageTile(?:\|(.*))?\]\]/", $character) > 0) {
 				return true;
 			}
 		}
 		foreach($this->what as $item) {
-			if(preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $item) > 0) {
+			if(preg_match("/\[\[$pageTile(?:\|(.*))?\]\]/", $item) > 0) {
 				return true;
 			}
 		}
 		
-		return preg_match("/\[\[" . $pageTile . "(?:\|(.*))?\]\]/", $this->where) > 0;
+		return preg_match("/\[\[$pageTile(?:\|(.*))?\]\]/", $this->where) > 0;
 	}
 	
 	public static function renderEvents($parsedEvents, $showTitle = false) {
@@ -127,6 +123,10 @@ class Event {
 	
 	public function getTitle() {
 		return $this->title;
+	}
+	
+	public function setWhen($when) {
+		$this->when = $when;
 	}
 	
 	public function getWhen() {

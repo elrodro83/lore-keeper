@@ -39,6 +39,24 @@ class Calendar{
 		return ($daysFromEraStart + $this->epochOffsetDays) * 24*60*60;
 	}
 	
+	public function fromTimestamp($timestamp) {
+		$daysFromEraStart = $timestamp / (24*60*60) - $this->epochOffsetDays;
+		
+		$year = floor(1 + ($daysFromEraStart / $this->resolveYearDays()));
+		$daysFromYearStart = $daysFromEraStart % $this->resolveYearDays();
+		
+		$days = 0;
+		foreach ($this->months as $month) {
+			$days += $month[2];
+			if($days >= $daysFromYearStart) {
+				$monthName = $month[0];
+				$day = 1 + $days - $daysFromYearStart;
+				return "$day-$monthName-$year $this->qualifier";
+			}
+		}
+		
+	}
+	
 	private function resolveUpToMonthDays($monthName) {
 		$days = 0;
 		foreach ($this->months as $month) {

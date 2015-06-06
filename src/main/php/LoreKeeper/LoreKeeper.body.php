@@ -29,7 +29,7 @@ class LoreKeeper {
 	
 	public static function wfTimelineRender( $parser ) {
 		try {
-			$timeline = new Timeline($parser);
+			$timeline = new Timeline($parser, func_get_args());
 			return array(Event::renderEvents($timeline->getEvents(), true), 'noparse' => false, 'nowiki' => false );
 		} catch(Exception $e) {
 			return array("* '''" . htmlspecialchars($e->getMessage()) . "'''", 'noparse' => false );

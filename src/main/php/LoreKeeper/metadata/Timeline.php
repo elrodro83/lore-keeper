@@ -2,9 +2,30 @@
 
 class Timeline {
 	
+// 	private $pages = array();
+	private $dateFrom = null;
+	private $dateTo = null;
+// 	private $categories = array();
+	private $calendarQualifier = "";
+	
 	private $events = array();
 	
-	function __construct($parser) {
+	function __construct($parser, $args) {
+		//Suppose the user invoked the parser function like so:
+		//{{#myparserfunction:foo=bar|apple=orange}}
+	
+		$opts = array();
+		// Argument 0 is $parser, so begin iterating at 1
+		for ( $i = 1; $i < count($args); $i++ ) {
+			array_push($opts, $args[ $i ]);
+		}
+		//The $opts array now looks like this:
+		//	[0] => 'foo=bar'
+		//	[1] => 'apple=orange'
+	
+		//Now we need to transform $opts into a more useful form...
+		$this->extractOptions( $opts );
+		
 		foreach($this->fetchBacklinkPages($parser) as $backlinkPage) {
 			$backlinkContent = $backlinkPage["revisions"][0]["*"];
 
@@ -20,9 +41,14 @@ class Timeline {
 				$parsedEvent = new Event(array_merge([$parser],
 						preg_split("/\|(?=when|what|where|who)/",
 								str_replace(array("\r\n", "\n", "\r"), "", $eventBody[1][0]))));
-				if($parsedEvent->hasLinksTo($parser->getTitle()->getBaseTitle())) {
+				if($parsedEvent->hasLinksTo($parser->getTitle()->getBaseTitle())
+						&& $this->checkDate($parsedEvent->getWhen())) {
 					$parsedEvent->setTitle($this->resolveEventTitle($backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1]));
 					$parsedEvent->setCategories($this->resolveEventCategories($backlinkContent));
+
+					if($this->calendarQualifier != null) {
+						$parsedEvent->setWhen($parsedEvent->getWhen()->toCalendar($this->calendarQualifier));
+					}
 					array_push($this->events, $parsedEvent);
 				}
 			}
@@ -36,6 +62,35 @@ class Timeline {
 		}
 		
 		usort($this->events, "Timeline::eventTimestampCmp");
+	}
+	
+	/**
+	 * Converts an array of values in form [0] => "name=value" into a real
+	 * associative array in form [name] => value
+	 *
+	 * @param array string $options
+	 * @return array $results
+	 */
+	public function extractOptions( array $options ) {
+		foreach ( $options as $option ) {
+			$pair = explode( '=', $option, 2 );
+			if ( count( $pair ) == 2 ) {
+				$name = trim( $pair[0] );
+				$value = trim( $pair[1] );
+// 				if("pages" == $name) {
+// 					$this->pages = explode(';', $value);
+// 				} else 
+					if("dateFrom" == $name) {
+					$this->dateFrom = new LKDate($value);
+				} else if("dateTo" == $name) {
+					$this->dateTo = new LKDate($value);
+// 				} else if("categories" == $name) {
+// 					$this->categories = explode(';', $value);
+				} else if("calendarQualifier" == $name) {
+					$this->calendarQualifier = $value;
+				}
+			}
+		}
 	}
 	
 	function eventTimestampCmp($eventA, $eventB) {
@@ -79,9 +134,9 @@ class Timeline {
 		if(in_array($rawEvent, $rawEventsWithSubtitles)) {
 			$subtitle = $subtitles[array_search($rawEvent, $rawEventsWithSubtitles)];
 			$strippedSubtitle = str_replace("]]", "", str_replace("[[", "", $subtitle));
-			return "[[" . $backlinkPageTitle . "#" . $strippedSubtitle . "|" .$strippedSubtitle. "]]";
+			return "[[$backlinkPageTitle#$strippedSubtitle|$strippedSubtitle]]";
 		} else {
-			return "[[" . $backlinkPageTitle . "]]";
+			return "[[$backlinkPageTitle]]";
 		}
 	}
 	
@@ -95,6 +150,11 @@ class Timeline {
 		}
 		
 		return $cats;
+	}
+	
+	private function checkDate($date) {
+		return ($this->dateFrom == null || $this->dateFrom->getTimestamp() <= $date->getTimestamp())
+			&& ($this->dateTo == null || $this->dateTo->getTimestamp() >= $date->getTimestamp());
 	}
 
 	public function getEvents() {

@@ -34,4 +34,10 @@ class LKDate {
 	public function getTimestamp() {
 		return $this->timestamp;
 	}
+	
+	public function toCalendar($calendarQualifier) {
+		$cf = LKDate::$calendarFactory;
+		$toCalendar = $cf::fetchCalendar($calendarQualifier);
+		return new LKDate($toCalendar->fromTimestamp($this->timestamp));
+	}
 }
