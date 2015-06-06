@@ -50,7 +50,7 @@ class Calendar{
 			$days += $month[2];
 			if($days >= $daysFromYearStart) {
 				$monthName = $month[0];
-				$day = 1 + $days - $daysFromYearStart;
+				$day = 1 + $daysFromYearStart - ($days - $month[2]);
 				return "$day-$monthName-$year $this->qualifier";
 			}
 		}
