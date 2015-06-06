@@ -2,7 +2,7 @@
 
 class Timeline {
 	
-// 	private $pages = array();
+	private $pages = array("_self");
 	private $dateFrom = null;
 	private $dateTo = null;
 // 	private $categories = array();
@@ -26,39 +26,46 @@ class Timeline {
 		//Now we need to transform $opts into a more useful form...
 		$this->extractOptions( $opts );
 		
-		foreach($this->fetchBacklinkPages($parser) as $backlinkPage) {
-			$backlinkContent = $backlinkPage["revisions"][0]["*"];
-
-			$rawEvents = [];
-			$subtitileEvents = [];
-			preg_match_all("/({{#event:[^}}]*}})/m", $backlinkContent, $rawEvents);
-			preg_match_all("/==+ ([^==+]+) ==+[^==+]*({{#event:[^}}]*}})/", $backlinkContent, $subtitileEvents);
-			
-			foreach($rawEvents[0] as $rawEvent) {
-				$eventBody = [];
-				preg_match_all("/{{#event:([^}}]*)}}/", $rawEvent, $eventBody);
-					
-				$parsedEvent = new Event(array_merge([$parser],
-						preg_split("/\|(?=when|what|where|who)/",
-								str_replace(array("\r\n", "\n", "\r"), "", $eventBody[1][0]))));
-				if($parsedEvent->hasLinksTo($parser->getTitle()->getBaseTitle())
-						&& $this->checkDate($parsedEvent->getWhen())) {
-					$parsedEvent->setTitle($this->resolveEventTitle($backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1]));
-					$parsedEvent->setCategories($this->resolveEventCategories($backlinkContent));
-
-					if($this->calendarQualifier != null) {
-						$parsedEvent->setWhen($parsedEvent->getWhen()->toCalendar($this->calendarQualifier));
-					}
-					array_push($this->events, $parsedEvent);
-				}
+		foreach($this->pages as $eventPageTitle) {
+			if($eventPageTitle === "_self") {
+				$eventPageTitle = $parser->getTitle()->getBaseTitle();
 			}
-			
-// 			http://www.mediawiki.org/wiki/Manual:Tag_extensions#Regenerating_the_page_when_another_page_is_edited
-			$title = Title::newFromText( $backlinkPage["title"] );
-			$rev = Revision::newFromTitle( $title );
-			$id = $rev ? $rev->getPage() : 0;
-			// Register dependency in templatelinks
-			$parser->getOutput()->addTemplate( $title, $id, $rev ? $rev->getId() : 0 );			
+			foreach($this->fetchBacklinkPages($eventPageTitle) as $backlinkPage) {
+				$backlinkContent = $backlinkPage["revisions"][0]["*"];
+	
+				$rawEvents = [];
+				$subtitileEvents = [];
+				preg_match_all("/({{#event:[^}}]*}})/m", $backlinkContent, $rawEvents);
+				preg_match_all("/==+ ([^==+]+) ==+[^==+]*({{#event:[^}}]*}})/", $backlinkContent, $subtitileEvents);
+				
+				foreach($rawEvents[0] as $rawEvent) {
+					$eventBody = [];
+					preg_match_all("/{{#event:([^}}]*)}}/", $rawEvent, $eventBody);
+						
+					$parsedEvent = new Event(array_merge([$parser],
+							preg_split("/\|(?=when|what|where|who)/",
+									str_replace(array("\r\n", "\n", "\r"), "", $eventBody[1][0]))));
+					if($parsedEvent->hasLinksTo($eventPageTitle)
+							&& $this->checkDate($parsedEvent->getWhen())) {
+						$title = $this->resolveEventTitle($backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1]);
+						$parsedEvent->setTitle($title);
+						$parsedEvent->setCategories($this->resolveEventCategories($backlinkContent));
+	
+						if($this->calendarQualifier != null) {
+							$parsedEvent->setWhen($parsedEvent->getWhen()->toCalendar($this->calendarQualifier));
+						}
+// 						array_push($this->events, $parsedEvent);
+						$this->events[$title] = $parsedEvent;
+					}
+				}
+				
+	// 			http://www.mediawiki.org/wiki/Manual:Tag_extensions#Regenerating_the_page_when_another_page_is_edited
+				$title = Title::newFromText( $backlinkPage["title"] );
+				$rev = Revision::newFromTitle( $title );
+				$id = $rev ? $rev->getPage() : 0;
+				// Register dependency in templatelinks
+				$parser->getOutput()->addTemplate( $title, $id, $rev ? $rev->getId() : 0 );			
+			}
 		}
 		
 		usort($this->events, "Timeline::eventTimestampCmp");
@@ -77,10 +84,9 @@ class Timeline {
 			if ( count( $pair ) == 2 ) {
 				$name = trim( $pair[0] );
 				$value = trim( $pair[1] );
-// 				if("pages" == $name) {
-// 					$this->pages = explode(';', $value);
-// 				} else 
-					if("dateFrom" == $name) {
+				if("pages" == $name) {
+					$this->pages = explode(';', $value);
+				} else if ("dateFrom" == $name) {
 					$this->dateFrom = new LKDate($value);
 				} else if("dateTo" == $name) {
 					$this->dateTo = new LKDate($value);
@@ -97,13 +103,13 @@ class Timeline {
 		return $eventA->getWhen()->getTimestamp() - $eventB->getWhen()->getTimestamp();
 	}
 	
-	private function fetchBacklinkPages($parser) {
+	private function fetchBacklinkPages($pageTitle) {
 		$backlinksApi = new ApiMain( new FauxRequest(
 				array(
 						'action' => 'query',
 						'list' => 'backlinks',
 						'format' => 'xml',
-						'bltitle' => $parser->getTitle()->getBaseTitle(),
+						'bltitle' => $pageTitle,
 						'blfilterredir' => 'all',
 						'bllimit' => 500),
 				true
