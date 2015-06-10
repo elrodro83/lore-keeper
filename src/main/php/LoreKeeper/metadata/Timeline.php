@@ -7,6 +7,7 @@ class Timeline {
 	private $dateTo = null;
 // 	private $categories = array();
 	private $calendarQualifier = "";
+	private $renderMode = "TABLE";
 	
 	private $events = array();
 	
@@ -47,15 +48,14 @@ class Timeline {
 									str_replace(array("\r\n", "\n", "\r"), "", $eventBody[1][0]))));
 					if($parsedEvent->hasLinksTo($eventPageTitle)
 							&& $this->checkDate($parsedEvent->getWhen())) {
-						$title = $this->resolveEventTitle($backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1]);
-						$parsedEvent->setTitle($title);
+						$this->resolveEventTitle($parsedEvent, $backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1]);
 						$parsedEvent->setCategories($this->resolveEventCategories($backlinkContent));
 	
 						if($this->calendarQualifier != null) {
 							$parsedEvent->setWhen($parsedEvent->getWhen()->toCalendar($this->calendarQualifier));
 						}
 // 						array_push($this->events, $parsedEvent);
-						$this->events[$title] = $parsedEvent;
+						$this->events[$parsedEvent->getWikiLink()] = $parsedEvent;
 					}
 				}
 				
@@ -94,6 +94,8 @@ class Timeline {
 // 					$this->categories = explode(';', $value);
 				} else if("calendarQualifier" == $name) {
 					$this->calendarQualifier = $value;
+				} else if("renderMode" == $name) {
+					$this->renderMode = $value;
 				}
 			}
 		}
@@ -136,13 +138,13 @@ class Timeline {
 		return $blContentData["query"]["pages"];
 	}
 	
-	private function resolveEventTitle($backlinkPageTitle, $rawEvent, $rawEventsWithSubtitles, $subtitles) {
+	private function resolveEventTitle($parsedEvent, $backlinkPageTitle, $rawEvent, $rawEventsWithSubtitles, $subtitles) {
 		if(in_array($rawEvent, $rawEventsWithSubtitles)) {
 			$subtitle = $subtitles[array_search($rawEvent, $rawEventsWithSubtitles)];
 			$strippedSubtitle = str_replace("]]", "", str_replace("[[", "", $subtitle));
-			return "[[$backlinkPageTitle#$strippedSubtitle|$strippedSubtitle]]";
+			$parsedEvent->setTitle($backlinkPageTitle, $strippedSubtitle);
 		} else {
-			return "[[$backlinkPageTitle]]";
+			$parsedEvent->setTitle($backlinkPageTitle, null);
 		}
 	}
 	
@@ -167,5 +169,7 @@ class Timeline {
 		return $this->events;
 	}
 	
-
+	public function getRenderMode() {
+		return $this->renderMode;
+	}
 }

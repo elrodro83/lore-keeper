@@ -30,7 +30,13 @@ class LoreKeeper {
 	public static function wfTimelineRender( $parser ) {
 		try {
 			$timeline = new Timeline($parser, func_get_args());
-			return array(Event::renderEvents($timeline->getEvents(), true), 'noparse' => false, 'nowiki' => false );
+			if("TABLE" === $timeline->getRenderMode()) {
+				return array(Event::renderEvents($timeline->getEvents(), true), 'noparse' => false, 'nowiki' => false );
+			} else if("TIMELINE" === $timeline->getRenderMode()) {
+				return array(Event::renderEventsTimeline($parser, $timeline->getEvents(), true), 'noparse' => true, 'isHTML' => true, "markerType" => 'nowiki' );
+			} else {
+				return array("* '''Invalid renderMode: " . htmlspecialchars($timeline->getRenderMode()) . "'''", 'noparse' => false );
+			}
 		} catch(Exception $e) {
 			return array("* '''" . htmlspecialchars($e->getMessage()) . "'''", 'noparse' => false );
 		}

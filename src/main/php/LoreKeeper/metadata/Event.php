@@ -1,7 +1,9 @@
 <?php
 class Event {
 	
-	private $title = "";
+	private $pageTitle = "";
+	private $sectionTitle = "";
+
 	private $categories = array();
 	private $when = "";
 	private $where = "";
@@ -90,7 +92,7 @@ class Event {
 		foreach($parsedEvents as $parsedEvent) {
 			$markUp .= "|-\n";
 			if($showTitle) {
-				$markUp .= "| $parsedEvent->title\n";
+				$markUp .= "| " . $parsedEvent->getWikiLink() . "\n";
 				$markUp .= "| \n";
 				foreach($parsedEvent->categories as $category) {
 					$markUp .= "* [[:Category:$category|$category]]\n";
@@ -112,17 +114,76 @@ class Event {
 		$markUp .= "|}";
 		return $markUp;
 	}
+	
+	public static function renderEventsTimeline($parser, $parsedEvents, $showTitle = false) {
+		$timeline = '<div id="timeline-embed"></div>
+<script type="text/javascript">
+	var dataObject = {
+	    "timeline":
+	    {
+	        "headline":"' . $parser->getTitle()->getBaseTitle() . '",
+	        "type":"default",
+	        "date": [';
+		
+		foreach($parsedEvents as $parsedEvent) {
+			$timeline = $timeline . '{
+	                "startDate":"' . date('Y,m,d', $parsedEvent->getWhen()->getTimestamp()) . '",
+	                "headline":"' . $parsedEvent->getTitle() . '",
+	                "text":\'' . $parsedEvent->getExternalLink($parser) . '\',
+	                "tag":"' . $parsedEvent->categories[0] . '",
+	                "asset": {
+	                    "media":"http://twitter.com/ArjunaSoriano/status/164181156147900416",
+	                    "thumbnail":"optional-32x32px.jpg",
+	                    "credit":"Credit Name Goes Here",
+	                    "caption":"Caption text goes here"
+	                }
+	            },';
+		}		
+		return $timeline . '{}
+	        ]
+	    }
+	}		
+	var timeline_config = {
+		width:              \'100%\',
+		height:             \'600\',
+		source:             dataObject
+	}
+</script>
+<script type="text/javascript" src="https://s3.amazonaws.com/cdn.knightlab.com/libs/timeline/latest/js/storyjs-embed.js"></script>';
+	}
 
-	public function setTitle($title) {
-		$this->title = $title;
+	public function setTitle($pageTitle, $sectionTitle) {
+		$this->pageTitle = $pageTitle;
+		$this->sectionTitle = $sectionTitle;
+	}
+	
+	public function getTitle() {
+		if($this->sectionTitle != null) {
+			return $this->sectionTitle;
+		} else {
+			return $this->pageTitle;
+		}
 	}
 	
 	public function setCategories($categories) {
 		$this->categories = $categories;
 	}
 	
-	public function getTitle() {
-		return $this->title;
+	public function getWikiLink() {
+		if($this->sectionTitle != null) {
+			return "[[$this->pageTitle#$this->sectionTitle|$this->sectionTitle]]";
+		} else {
+			return "[[$this->pageTitle]]";
+		}
+	}
+	
+	public function getExternalLink($parser) {
+		if($this->sectionTitle != null) {
+// 		CoreParserFunctions::anchorencode($parser, $this->sectionTitle);
+			return $parser->replaceInternalLinks("[[$this->pageTitle#$this->sectionTitle|$this->sectionTitle]]");
+		} else {
+			return $parser->replaceInternalLinks("[[$this->pageTitle]]");
+		}
 	}
 	
 	public function setWhen($when) {
