@@ -116,6 +116,7 @@ class Event {
 	}
 	
 	public static function renderEventsTimeline($parser, $parsedEvents, $showTitle = false) {
+		global $wgExtensionAssetsPath;
 		$timeline = '<div id="timeline-embed"></div>
 <script type="text/javascript">
 	var dataObject = {
@@ -132,10 +133,9 @@ class Event {
 	                "text":\'' . $parsedEvent->getExternalLink($parser) . '\',
 	                "tag":"' . $parsedEvent->categories[0] . '",
 	                "asset": {
-	                    "media":"http://twitter.com/ArjunaSoriano/status/164181156147900416",
+	                    "media":"' . Title::newFromText($parsedEvent->pageTitle)->getFullURL() . '",
 	                    "thumbnail":"optional-32x32px.jpg",
-	                    "credit":"Credit Name Goes Here",
-	                    "caption":"Caption text goes here"
+	                    "caption":"' . $parsedEvent->pageTitle . '"
 	                }
 	            },';
 		}		
@@ -149,9 +149,9 @@ class Event {
 		source:             dataObject
 	}
 </script>
-<script type="text/javascript" src="https://s3.amazonaws.com/cdn.knightlab.com/libs/timeline/latest/js/storyjs-embed.js"></script>';
+<script type="text/javascript" src="' . $wgExtensionAssetsPath . '/LoreKeeper/libs/timeline/js/storyjs-embed.js"></script>';
 	}
-
+	
 	public function setTitle($pageTitle, $sectionTitle) {
 		$this->pageTitle = $pageTitle;
 		$this->sectionTitle = $sectionTitle;
@@ -178,12 +178,7 @@ class Event {
 	}
 	
 	public function getExternalLink($parser) {
-		if($this->sectionTitle != null) {
-// 		CoreParserFunctions::anchorencode($parser, $this->sectionTitle);
-			return $parser->replaceInternalLinks("[[$this->pageTitle#$this->sectionTitle|$this->sectionTitle]]");
-		} else {
-			return $parser->replaceInternalLinks("[[$this->pageTitle]]");
-		}
+		return $parser->replaceInternalLinks($this->getWikiLink());
 	}
 	
 	public function setWhen($when) {
