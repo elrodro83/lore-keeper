@@ -29,46 +29,52 @@ class Timeline {
 		
 		foreach($this->pages as $eventPageTitle) {
 			if($eventPageTitle === "_self") {
-				$eventPageTitle = $parser->getTitle()->getBaseTitle();
+				$eventPageTitle = $parser->getTitle()->getBaseText();
 			}
-			foreach($this->fetchBacklinkPages($eventPageTitle) as $backlinkPage) {
+			
+			foreach($this->fetchBacklinkPages($parser, $eventPageTitle) as $backlinkPage) {
+				$backlinkTitle = $backlinkPage["title"];
 				$backlinkContent = $backlinkPage["revisions"][0]["*"];
-	
-				$rawEvents = [];
-				$subtitileEvents = [];
-				preg_match_all("/({{#event:[^}}]*}})/m", $backlinkContent, $rawEvents);
-				preg_match_all("/==+ ([^==+]+) ==+[^==+]*({{#event:[^}}]*}})/", $backlinkContent, $subtitileEvents);
 				
-				foreach($rawEvents[0] as $rawEvent) {
-					$eventBody = [];
-					preg_match_all("/{{#event:([^}}]*)}}/", $rawEvent, $eventBody);
-						
-					$parsedEvent = new Event(array_merge([$parser],
-							preg_split("/\|(?=when|what|where|who)/",
-									str_replace(array("\r\n", "\n", "\r"), "", $eventBody[1][0]))));
-					if($parsedEvent->hasLinksTo($eventPageTitle)
-							&& $this->checkDate($parsedEvent->getWhen())) {
-						$this->resolveEventTitle($parsedEvent, $backlinkPage["title"], $rawEvent, $subtitileEvents[2], $subtitileEvents[1]);
-						$parsedEvent->setCategories($this->resolveEventCategories($backlinkContent));
-	
-						if($this->calendarQualifier != null) {
-							$parsedEvent->setWhen($parsedEvent->getWhen()->toCalendar($this->calendarQualifier));
-						}
-// 						array_push($this->events, $parsedEvent);
-						$this->events[$parsedEvent->getWikiLink()] = $parsedEvent;
-					}
-				}
-				
-	// 			http://www.mediawiki.org/wiki/Manual:Tag_extensions#Regenerating_the_page_when_another_page_is_edited
-				$title = Title::newFromText( $backlinkPage["title"] );
-				$rev = Revision::newFromTitle( $title );
-				$id = $rev ? $rev->getPage() : 0;
-				// Register dependency in templatelinks
-				$parser->getOutput()->addTemplate( $title, $id, $rev ? $rev->getId() : 0 );			
+				$this->processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent);
 			}
 		}
 		
 		usort($this->events, "Timeline::eventTimestampCmp");
+	}
+	
+	private function processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent) {
+		$rawEvents = [];
+		$subtitileEvents = [];
+		preg_match_all("/({{#event:[^}}]*}})/m", $backlinkContent, $rawEvents);
+		preg_match_all("/==+ ([^==+]+) ==+[^==+]*({{#event:[^}}]*}})/", $backlinkContent, $subtitileEvents);
+		
+		foreach($rawEvents[0] as $rawEvent) {
+			$eventBody = [];
+			preg_match_all("/{{#event:([^}}]*)}}/", $rawEvent, $eventBody);
+		
+			$parsedEvent = new Event(array_merge([$parser],
+					preg_split("/\|(?=when|what|where|who)/",
+							str_replace(array("\r\n", "\n", "\r"), "", $eventBody[1][0]))));
+			if($parsedEvent->hasLinksTo($eventPageTitle)
+					&& $this->checkDate($parsedEvent->getWhen())) {
+						$this->resolveEventTitle($parsedEvent, $backlinkTitle, $rawEvent, $subtitileEvents[2], $subtitileEvents[1]);
+						$parsedEvent->setCategories($this->resolveEventCategories($backlinkContent));
+		
+						if($this->calendarQualifier != null) {
+							$parsedEvent->setWhen($parsedEvent->getWhen()->toCalendar($this->calendarQualifier));
+						}
+						// 						array_push($this->events, $parsedEvent);
+						$this->events[$parsedEvent->getWikiLink()] = $parsedEvent;
+					}
+		}
+		
+		// 			http://www.mediawiki.org/wiki/Manual:Tag_extensions#Regenerating_the_page_when_another_page_is_edited
+		$title = Title::newFromText( $backlinkTitle );
+		$rev = Revision::newFromTitle( $title );
+		$id = $rev ? $rev->getPage() : 0;
+		// Register dependency in templatelinks
+		$parser->getOutput()->addTemplate( $title, $id, $rev ? $rev->getId() : 0 );
 	}
 	
 	/**
@@ -105,7 +111,7 @@ class Timeline {
 		return $eventA->getWhen()->getTimestamp() - $eventB->getWhen()->getTimestamp();
 	}
 	
-	private function fetchBacklinkPages($pageTitle) {
+	private function fetchBacklinkPages($parser, $pageTitle) {
 		$backlinksApi = new ApiMain( new FauxRequest(
 				array(
 						'action' => 'query',
@@ -122,6 +128,10 @@ class Timeline {
 		$pageids = [];
 		foreach($backlinksData["query"]["backlinks"] as $backlink) {
 			array_push($pageids, $backlink["pageid"]);
+		}
+		$currentPageId = CoreParserFunctions::pageid($parser, $pageTitle);
+		if($currentPageId != null) {
+			array_push($pageids, $currentPageId);
 		}
 		
 		$blContentApi = new ApiMain( new FauxRequest(
