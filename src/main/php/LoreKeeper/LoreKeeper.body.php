@@ -6,6 +6,7 @@ class LoreKeeper {
 		$parser->setFunctionHook ( 'calendar', 'LoreKeeper::wfCalendarRender' );
 		$parser->setFunctionHook ( 'event', 'LoreKeeper::wfEventRender' );
 		$parser->setFunctionHook ( 'timeline', 'LoreKeeper::wfTimelineRender' );
+		$parser->setFunctionHook ( 'date', 'LoreKeeper::wfDateRender' );
 		return true;
 	}
 	
@@ -37,6 +38,17 @@ class LoreKeeper {
 			} else {
 				return array("* '''Invalid renderMode: " . htmlspecialchars($timeline->getRenderMode()) . "'''", 'noparse' => false );
 			}
+		} catch(Exception $e) {
+			return array("* '''" . htmlspecialchars($e->getMessage()) . "'''", 'noparse' => false );
+		}
+	}
+	
+	public static function wfDateRender($parser, $dateString, $targetEra) {
+// 		return array($dateString . ' -> ' . $targetEra, 'noparse' => false);
+		
+		try {
+			$date = new LKDate($dateString);
+			return array($date->toCalendar($targetEra)->getDateString(), 'noparse' => false);
 		} catch(Exception $e) {
 			return array("* '''" . htmlspecialchars($e->getMessage()) . "'''", 'noparse' => false );
 		}
