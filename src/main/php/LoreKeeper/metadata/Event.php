@@ -129,15 +129,16 @@ class Event {
 		foreach($parsedEvents as $parsedEvent) {
 			$timeline = $timeline . '{
 	                "startDate":"' . date('Y,m,d', $parsedEvent->getWhen()->getTimestamp()) . '",
-	                "headline":"' . $parsedEvent->getTitle() . '",
+	                "headline":\'' . $parsedEvent->getExternalLink($parser) . '\',
 	                "text":\'' . $parsedEvent->getExternalLink($parser) . '\',
 	                "tag":"' . $parsedEvent->categories[0] . '",
 	                "asset": {
-	                    "media":"' . Title::newFromText($parsedEvent->pageTitle)->getFullURL() . '",
 	                    "thumbnail":"optional-32x32px.jpg",
 	                    "caption":"' . $parsedEvent->pageTitle . '"
 	                }
 	            },';
+// 	                '"text":\'' . $parser->internalParse(Event::renderEvents([$parsedEvent]), false) . '\',' .
+// 	                    "media":"' . Title::newFromText($parsedEvent->pageTitle)->getFullURL() . '",
 		}		
 		return $timeline . '{}
 	        ]

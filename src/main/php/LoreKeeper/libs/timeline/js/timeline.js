@@ -1,6 +1,6 @@
 /*
-    TimelineJS - ver. 2015-06-10-16-17-35 - 2015-06-10
-    Copyright (c) 2012-2015 Northwestern University
+    TimelineJS - ver. 2.36.0 - 2015-05-12
+    Copyright (c) 2012-2013 Northwestern University
     a project of the Northwestern University Knight Lab, originally created by Zach Wise
     https://github.com/NUKnightLab/TimelineJS
     This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
@@ -7225,6 +7225,10 @@ if(typeof VMM != 'undefined' && typeof VMM.Timeline == 'undefined') {
 			
 		};
 		
+		function onDatesProcessed() {
+			build();
+		}
+		
 		function reSize() {
 			
 			updateSize();
@@ -7431,10 +7435,7 @@ if(typeof VMM != 'undefined' && typeof VMM.Timeline == 'undefined') {
 		/* BUILD DISPLAY
 		================================================== */
 		function build() {
-			if (!(data && data.date && data.date.length && data.date.length > 0)) {
-				showMessege(null, "Error reading data.");
-				return;
-			}
+			
 			// START AT SLIDE
 			if (parseInt(config.start_at_slide) > 0 && config.current_slide == 0) {
 				config.current_slide = parseInt(config.start_at_slide); 
@@ -7507,7 +7508,6 @@ if(typeof VMM != 'undefined' && typeof VMM.Timeline == 'undefined') {
 		};
 		
 		// BUILD DATE OBJECTS
-		// called from onDataReady, passes to function build 
 		function buildDates() {
 			
 			_dates = [];
@@ -7525,9 +7525,7 @@ if(typeof VMM != 'undefined' && typeof VMM.Timeline == 'undefined') {
 					_date.startdate		= do_start.date;
 					_date.precisiondate	= do_start.precision;
 					
-					if (isNaN(_date.startdate)) {
-						trace("Failed to parse start date " + data.date[i].startDate);
-					} else {
+					if (!isNaN(_date.startdate)) {
 						
 					
 						// END DATE
@@ -7565,11 +7563,6 @@ if(typeof VMM != 'undefined' && typeof VMM.Timeline == 'undefined') {
 				}
 				
 			};
-
-			if (data.date.length != _dates.length) {
-				showMessege(null,"Error processing data. Check for invalid date formats.")
-				return;
-			}
 			
 			/* CUSTOM SORT
 			================================================== */
@@ -7650,7 +7643,7 @@ if(typeof VMM != 'undefined' && typeof VMM.Timeline == 'undefined') {
 				});
 			}
 			
-			build();
+			onDatesProcessed();
 		}
 		
 	};
@@ -9566,10 +9559,6 @@ if (typeof VMM.Timeline !== 'undefined' && typeof VMM.Timeline.DataObj == 'undef
 							}
 						
 							if (dd_type.match("start") || dd_type.match("title") ) {
-								if (data_obj.timeline.startDate) {
-									VMM.fireEvent(global, VMM.Timeline.Config.events.messege, "Invalid data: Multiple 'title' slides. You should only have one row with 'title' in the 'type' column.");
-									return;
-								}
 								data_obj.timeline.startDate		= getGVar(dd.gsx$startdate);
 								data_obj.timeline.headline		= getGVar(dd.gsx$headline);
 								data_obj.timeline.asset.media	= getGVar(dd.gsx$media);
