@@ -35,15 +35,26 @@ class Calendar{
 	}
 
 	public function toTimestamp($day, $monthName, $year) {
-		$daysFromEraStart = ($year - 1) * $this->resolveYearDays() + $this->resolveUpToMonthDays($monthName) + ($day - 1);
+		if($year >= 0) {
+			$daysFromEraStart = ($year - 1) * $this->resolveYearDays() + $this->resolveUpToMonthDays($monthName) + ($day - 1);
+		} else {
+			$daysFromEraStart = ($year) * $this->resolveYearDays() + $this->resolveUpToMonthDays($monthName) + ($day - 1);
+		}
 		return ($daysFromEraStart + $this->epochOffsetDays) * 24*60*60;
 	}
 	
 	public function fromTimestamp($timestamp) {
 		$daysFromEraStart = $timestamp / (24*60*60) - $this->epochOffsetDays;
 		
-		$year = floor(1 + ($daysFromEraStart / $this->resolveYearDays()));
+		if($daysFromEraStart >= 0) {
+			$year = floor(1 + ($daysFromEraStart / $this->resolveYearDays()));
+		} else {
+			$year = floor($daysFromEraStart / $this->resolveYearDays());
+		}
 		$daysFromYearStart = $daysFromEraStart % $this->resolveYearDays();
+		if($daysFromYearStart < 0) {
+			$daysFromYearStart = $this->resolveYearDays() + $daysFromYearStart;
+		}
 		
 		$days = 0;
 		foreach ($this->months as $month) {

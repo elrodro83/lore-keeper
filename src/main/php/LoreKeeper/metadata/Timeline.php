@@ -6,7 +6,7 @@ class Timeline {
 	private $dateFrom = null;
 	private $dateTo = null;
 // 	private $categories = array();
-	private $calendarQualifier = "";
+	private $calendarQualifier = null;
 	private $renderMode = "TABLE";
 	
 	private $events = array();

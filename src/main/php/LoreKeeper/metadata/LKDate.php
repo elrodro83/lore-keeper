@@ -14,7 +14,7 @@ class LKDate {
 	 */
 	function __construct($dateString) {
 		$dateParts = [];
-		preg_match_all("/([0-9]{1,2})[-|\/]([^-|\/]+)[-|\/]([0-9]+) (\w{2,})/", $dateString, $dateParts);
+		preg_match_all("/([0-9]{1,2})[-|\/]([^-|\/]+)[-|\/](-?[0-9]+) (\w{2,})/", $dateString, $dateParts);
 		$eraQualifier = $dateParts[4][0];
 		
 		$this->dateString = $dateString;
