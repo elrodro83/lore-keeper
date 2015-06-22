@@ -94,7 +94,7 @@ class Event {
 			if($showTitle) {
 				$markUp .= "| " . $parsedEvent->getWikiLink() . "\n";
 				$markUp .= "| \n";
-				foreach($parsedEvent->categories as $category) {
+				foreach(Event::filterKnowledgeCategories($parsedEvent->categories) as $category) {
 					$markUp .= "* [[:Category:$category|$category]]\n";
 				}
 			}
@@ -117,40 +117,78 @@ class Event {
 	
 	public static function renderEventsTimeline($parser, $parsedEvents, $showTitle = false) {
 		global $wgExtensionAssetsPath;
-		$timeline = '<div id="timeline-embed"></div>
-<script type="text/javascript">
-	var dataObject = {
-	    "timeline":
-	    {
-	        "headline":"' . $parser->getTitle()->getBaseTitle() . '",
-	        "type":"default",
-	        "date": [';
+		
+		$timelineDataObject = array();
+		
+		$timelineDataObject["headline"] = $parser->getTitle()->getBaseText();
+		$timelineDataObject["type"] = "default";
+		$timelineDataObject["date"] = array();
 		
 		foreach($parsedEvents as $parsedEvent) {
-			$timeline = $timeline . '{
-	                "startDate":"' . date('Y,m,d', $parsedEvent->getWhen()->getTimestamp()) . '",
-	                "headline":\'' . $parsedEvent->getExternalLink($parser) . '\',
-	                "text":\'' . $parsedEvent->getExternalLink($parser) . '\',
-	                "tag":"' . $parsedEvent->categories[0] . '",
-	                "asset": {
-	                    "thumbnail":"optional-32x32px.jpg",
-	                    "caption":"' . $parsedEvent->pageTitle . '"
-	                }
-	            },';
-// 	                '"text":\'' . $parser->internalParse(Event::renderEvents([$parsedEvent]), false) . '\',' .
-// 	                    "media":"' . Title::newFromText($parsedEvent->pageTitle)->getFullURL() . '",
-		}		
-		return $timeline . '{}
-	        ]
-	    }
-	}		
+			$timelineEvent = array();
+			
+			$externalLink = $parsedEvent->getExternalLink($parser);
+			$parser->replaceLinkHolders($externalLink);
+			
+			$timelineEvent["startDate"] = date('Y,m,d', $parsedEvent->getWhen()->getTimestamp());
+			$timelineEvent["headline"] = $externalLink;
+			$timelineEvent["text"] = $externalLink;
+			$timelineEvent["tag"] = Event::filterKnowledgeCategories($parsedEvent->categories);
+			$timelineEvent["asset"] = array(
+					"thumbnail" => "optional-32x32px.jpg",
+					"caption" => $parsedEvent->pageTitle
+			);
+				
+			array_push($timelineDataObject["date"], $timelineEvent);
+		}
+		
+		$dataObject = json_encode($timelineDataObject);
+		
+		$timelineHtml = "
+<div id='timeline-embed'></div>
+<script type='text/javascript'>
 	var timeline_config = {
-		width:              \'100%\',
-		height:             \'600\',
-		source:             dataObject
+		\"debug\": true,
+		\"width\":              \"100%\",
+		\"height\":             \"600\",
+		\"source\":             {\"timeline\":$dataObject}
 	}
 </script>
-<script type="text/javascript" src="' . $wgExtensionAssetsPath . '/LoreKeeper/libs/timeline/js/storyjs-embed.js"></script>';
+<script type='text/javascript' src='$wgExtensionAssetsPath/LoreKeeper/libs/timeline/js/storyjs-embed.js'></script>";
+		
+		return $timelineHtml;
+	}
+	
+	private static function filterKnowledgeCategories($categoryNames) {
+		$prefixedCategories = array();
+		foreach($categoryNames as $categoryName) {
+			array_push($prefixedCategories, "Category:$categoryName");
+		}
+		
+		
+		// api.php?action=query&prop=categories&format=json&titles=Category%3AHistoria|Category%3ANaturaleza
+		$categoryInfoApi = new ApiMain( new FauxRequest(
+				array(
+						'action' => 'query',
+						'prop' => 'categories',
+						'format' => 'xml',
+						'titles' => implode("|", $prefixedCategories)),
+				true
+		) );
+		$categoryInfoApi->execute();
+		$categoryInfoData = & $categoryInfoApi->getResultData();
+		
+		$filtered = array();
+		foreach($categoryInfoData["query"]["pages"] as $categoryPage) {
+			foreach($categoryPage["categories"] as $category) {
+				$superCategory = explode(":", $category["title"])[1];
+				if(wfMessage("knowledgeCategory")->text() === $superCategory) {
+					array_push($filtered, explode(":", $categoryPage["title"])[1]);
+				}
+			}
+		}
+		
+		return $filtered;
 	}
 	
 	public function setTitle($pageTitle, $sectionTitle) {
@@ -178,6 +216,10 @@ class Event {
 		}
 	}
 	
+	/**
+	 * This returns the placeholder for an external link
+	 * @param unknown $parser
+	 */
 	public function getExternalLink($parser) {
 		return $parser->replaceInternalLinks($this->getWikiLink());
 	}

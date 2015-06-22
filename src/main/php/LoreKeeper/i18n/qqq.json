@@ -4,6 +4,7 @@
     },
     "lorekeeper-desc": "{{desc}}",
 	"categories": "{{categories}}",
+	"knowledgeCategory": "Name of the Category that groups the 'knopwledge' subcategories",
 	"who": "{{who}}",
 	"what": "{{what}}",
 	"when": "{{when}}",
