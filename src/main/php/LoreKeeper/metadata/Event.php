@@ -117,6 +117,7 @@ class Event {
 	
 	public static function renderEventsTimeline($parser, $parsedEvents, $showTitle = false) {
 		global $wgExtensionAssetsPath;
+		global $wgLanguageCode;
 		
 		$timelineDataObject = array();
 		
@@ -149,6 +150,8 @@ class Event {
 <script type='text/javascript'>
 	var timeline_config = {
 		\"debug\": true,
+		\"lang\":               \"$wgLanguageCode\",
+		\"calendar\":           \"$wgExtensionAssetsPath/LoreKeeper/libs/DummyCalendar.js\",
 		\"width\":              \"100%\",
 		\"height\":             \"600\",
 		\"source\":             {\"timeline\":$dataObject}
