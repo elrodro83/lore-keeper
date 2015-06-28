@@ -7,6 +7,7 @@ class Timeline {
 	private $dateTo = null;
 // 	private $categories = array();
 	private $calendarQualifier = null;
+	private $calendarJSFormatter = null;
 	private $renderMode = "TABLE";
 	
 	private $events = array();
@@ -100,6 +101,8 @@ class Timeline {
 // 					$this->categories = explode(';', $value);
 				} else if("calendarQualifier" == $name) {
 					$this->calendarQualifier = $value;
+				} else if("calendarJSFormatter" == $name) {
+					$this->calendarJSFormatter = $value;
 				} else if("renderMode" == $name) {
 					$this->renderMode = $value;
 				}
@@ -181,5 +184,9 @@ class Timeline {
 	
 	public function getRenderMode() {
 		return $this->renderMode;
+	}
+	
+	public function getCalendarJSFormatter() {
+		return $this->calendarJSFormatter;
 	}
 }

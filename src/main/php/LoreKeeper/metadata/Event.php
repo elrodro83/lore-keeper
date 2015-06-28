@@ -77,14 +77,16 @@ class Event {
 		return preg_match("/\[\[$pageTile(?:\|(.*))?\]\]/", $this->where) > 0;
 	}
 	
-	public static function renderEvents($parsedEvents, $showTitle = false) {
+	public static function renderEvents($parsedEvents, $showTitle = false, $showWhen = true) {
 		$markUp = "{| class=\"wikitable\"\n";
 			
 		if($showTitle) {
 			$markUp .= "! \n";
 			$markUp .= "! " . wfMessage("categories") . "\n";
 		}
-		$markUp .= "! " . wfMessage("when") . "\n";
+		if($showWhen) {
+			$markUp .= "! " . wfMessage("when") . "\n";
+		}
 		$markUp .= "! " . wfMessage("where") . "\n";
 		$markUp .= "! " . wfMessage("who") . "\n";
 		$markUp .= "! " . wfMessage("what") . "\n";
@@ -98,7 +100,9 @@ class Event {
 					$markUp .= "* [[:Category:$category|$category]]\n";
 				}
 			}
-			$markUp .= "| " . $parsedEvent->when->getDateString() . "\n";
+			if($showWhen) {
+				$markUp .= "| " . $parsedEvent->when->getDateString() . "\n";
+			}
 			$markUp .= "| $parsedEvent->where\n";
 			$markUp .= "|\n";
 			foreach($parsedEvent->who as $who) {
@@ -115,7 +119,7 @@ class Event {
 		return $markUp;
 	}
 	
-	public static function renderEventsTimeline($parser, $parsedEvents, $showTitle = false) {
+	public static function renderEventsTimeline($parser, $parsedEvents, $calendarJSFormatter, $showTitle = false) {
 		global $wgExtensionAssetsPath;
 		global $wgLanguageCode;
 		
@@ -133,7 +137,15 @@ class Event {
 			
 			$timelineEvent["startDate"] = date('Y,m,d', $parsedEvent->getWhen()->getTimestamp());
 			$timelineEvent["headline"] = $externalLink;
-			$timelineEvent["text"] = $externalLink;
+			
+			$eventProcessed = $parser->doBlockLevels(
+					$parser->replaceInternalLinks(
+							$parser->recursiveTagParse(Event::renderEvents(array($parsedEvent), false, false))
+						)
+				, false);
+			$parser->replaceLinkHolders($eventProcessed);
+			
+			$timelineEvent["text"] = $eventProcessed;
 			$timelineEvent["tag"] = Event::filterKnowledgeCategories($parsedEvent->categories);
 			$timelineEvent["asset"] = array(
 					"thumbnail" => "optional-32x32px.jpg",
@@ -145,19 +157,18 @@ class Event {
 		
 		$dataObject = json_encode($timelineDataObject);
 		
-		$timelineHtml = "
-<div id='timeline-embed'></div>
-<script type='text/javascript'>
-	var timeline_config = {
-		\"debug\": true,
-		\"lang\":               \"$wgLanguageCode\",
-		\"calendar\":           \"$wgExtensionAssetsPath/LoreKeeper/libs/DummyCalendar.js\",
-		\"width\":              \"100%\",
-		\"height\":             \"600\",
-		\"source\":             {\"timeline\":$dataObject}
-	}
-</script>
-<script type='text/javascript' src='$wgExtensionAssetsPath/LoreKeeper/libs/timeline/js/storyjs-embed.js'></script>";
+		$timelineHtml = 
+'<div id="timeline-embed"></div>' .
+'<script type="text/javascript">' .
+'	var timeline_config = {' .
+'		"lang":               "' . $wgLanguageCode . '",' .
+'		"calendar":           "' . $calendarJSFormatter . '",' .
+'		"width":              "100%",' .
+'		"height":             "600",' .
+'		"source":             {"timeline":' . $dataObject . '}' .
+'	}' .
+'</script>' .
+'<script type="text/javascript" src="' . $wgExtensionAssetsPath . '/LoreKeeper/libs/timeline/js/storyjs-embed.js"></script>';
 		
 		return $timelineHtml;
 	}
