@@ -34,7 +34,9 @@ class LoreKeeper {
 			if("TABLE" === $timeline->getRenderMode()) {
 				return array(Event::renderEvents($timeline->getEvents(), true), 'noparse' => false, 'nowiki' => false );
 			} else if("TIMELINE" === $timeline->getRenderMode()) {
-				return array(Event::renderEventsTimeline($parser, $timeline->getEvents(), true), 'noparse' => true, 'isHTML' => true, "markerType" => 'nowiki' );
+				return array(Event::renderEventsTimeline($parser, $timeline->getEvents(),
+						($timeline->getCalendarJSFormatter() != null ? $timeline->getCalendarJSFormatter() : "/default.js"),
+						true), 'noparse' => true, 'isHTML' => true, "markerType" => 'nowiki' );
 			} else {
 				return array("* '''Invalid renderMode: " . htmlspecialchars($timeline->getRenderMode()) . "'''", 'noparse' => false );
 			}
