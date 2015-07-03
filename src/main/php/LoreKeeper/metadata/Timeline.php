@@ -29,7 +29,7 @@ class Timeline {
 		//Now we need to transform $opts into a more useful form...
 		$this->extractOptions( $opts );
 		
-		$currentPageId = CoreParserFunctions::pageid($parser, $pageTitle);
+		$currentPageId = CoreParserFunctions::pageid($parser, $parser->getTitle()->getBaseText());
 		foreach($this->pages as $eventPageTitle) {
 			if($eventPageTitle === "_self") {
 				$eventPageTitle = $parser->getTitle()->getBaseText();
@@ -50,7 +50,7 @@ class Timeline {
 		
 		usort($this->events, "Timeline::eventTimestampCmp");
 		
-		foreach($this->fetchPagesByIds(array(CoreParserFunctions::pageid($parser, $parser->getTitle()->getBaseText()))) as $currentPage) {
+		foreach($this->fetchPagesByIds(array($currentPageId)) as $currentPage) {
 			$selfContent = $currentPage["revisions"][0]["*"];
 			
 			$rawEras = [];
