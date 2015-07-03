@@ -15,6 +15,7 @@ class Timeline {
 	private $renderMode = "TABLE";
 	
 	private $events = array();
+	private $eras = array();
 	
 	function __construct($parser, $args) {
 		//Suppose the user invoked the parser function like so:
@@ -32,12 +33,18 @@ class Timeline {
 		//Now we need to transform $opts into a more useful form...
 		$this->extractOptions( $opts );
 		
+		$currentPageId = CoreParserFunctions::pageid($parser, $pageTitle);
 		foreach($this->pages as $eventPageTitle) {
 			if($eventPageTitle === "_self") {
 				$eventPageTitle = $parser->getTitle()->getBaseText();
 			}
 			
-			foreach($this->fetchBacklinkPages($parser, $eventPageTitle) as $backlinkPage) {
+			$pageids = $this->getBacklinkPagesIds($parser, $eventPageTitle);
+			if($currentPageId != null) {
+				array_push($pageids, $currentPageId);
+			}
+			
+			foreach($this->fetchPagesByIds($pageids) as $backlinkPage) {
 				if(is_array($backlinkPage)) {
 					$backlinkTitle = $backlinkPage["title"];
 					$backlinkContent = $backlinkPage["revisions"][0]["slots"]["main"]["content"];
@@ -48,6 +55,21 @@ class Timeline {
 		}
 		
 		usort($this->events, "Timeline::eventTimestampCmp");
+		
+		foreach($this->fetchPagesByIds(array(CoreParserFunctions::pageid($parser, $parser->getTitle()->getBaseText()))) as $currentPage) {
+			$selfContent = $currentPage["revisions"][0]["*"];
+			
+			$rawEras = [];
+			preg_match_all("/{{#era:([^}}]*)}}/m", $selfContent, $rawEras);
+			
+			foreach($rawEras[1] as $rawEra) {
+				$parsedEra = new Era(array_merge([$parser],
+						preg_split("/\|(?=name|from|to)/",
+								str_replace(array("\r\n", "\n", "\r"), "", $rawEra))));
+
+				array_push($this->eras, $parsedEra);
+			}
+		}
 	}
 	
 	private function processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent) {
@@ -121,7 +143,7 @@ class Timeline {
 		return $eventA->getWhen()->getTimestamp() - $eventB->getWhen()->getTimestamp();
 	}
 	
-	private function fetchBacklinkPages($parser, $pageTitle) {
+	private function getBacklinkPagesIds($parser, $pageTitle) {
 		$backlinksApi = new ApiMain( new FauxRequest(
 				array(
 						'action' => 'query',
@@ -143,11 +165,10 @@ class Timeline {
 			}
 		}
 
-		$currentPageId = CoreParserFunctions::pageid($parser, $pageTitle);
-		if($currentPageId != null) {
-			array_push($pageids, $currentPageId);
-		}
-
+		return $pageids;
+	}
+	
+	private function fetchPagesByIds($pageids) {
 		$blContentApi = new ApiMain( new FauxRequest(
 				array(
 						'action' => 'query',
@@ -162,6 +183,7 @@ class Timeline {
 		$blContentData = $blContentApi->getResult()->getResultData();
 		return $blContentData["query"]["pages"];
 	}
+	
 	
 	private function resolveEventTitle($parsedEvent, $backlinkPageTitle, $rawEvent, $rawEventsWithSubtitles, $subtitles) {
 		if(in_array($rawEvent, $rawEventsWithSubtitles)) {
@@ -192,6 +214,10 @@ class Timeline {
 
 	public function getEvents() {
 		return $this->events;
+	}
+	
+	public function getEras() {
+		return $this->eras;
 	}
 	
 	public function getRenderMode() {
