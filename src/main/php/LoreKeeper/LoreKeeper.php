@@ -34,6 +34,7 @@ $wgAutoloadClasses['Calendar'] = $dir . '/metadata/Calendar.php';
 $wgAutoloadClasses['InPageCalendar'] = $dir . '/metadata/InPageCalendar.php';
 $wgAutoloadClasses['LKDate'] = $dir . '/metadata/LKDate.php';
 $wgAutoloadClasses['Event'] = $dir . '/metadata/Event.php';
+$wgAutoloadClasses['Era'] = $dir . '/metadata/Era.php';
 $wgAutoloadClasses['Timeline'] = $dir . '/metadata/Timeline.php';
 
 $wgMessagesDirs['Example'] = __DIR__ . '/i18n';
