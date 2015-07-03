@@ -5,6 +5,7 @@ class LoreKeeper {
 	public static function onParserFirstCallInit(&$parser) {
 		$parser->setFunctionHook ( 'calendar', 'LoreKeeper::wfCalendarRender' );
 		$parser->setFunctionHook ( 'event', 'LoreKeeper::wfEventRender' );
+		$parser->setFunctionHook ( 'era', 'LoreKeeper::wfEraRender' );
 		$parser->setFunctionHook ( 'timeline', 'LoreKeeper::wfTimelineRender' );
 		$parser->setFunctionHook ( 'date', 'LoreKeeper::wfDateRender' );
 		return true;
@@ -28,13 +29,22 @@ class LoreKeeper {
 		}
 	}
 	
+	public static function wfEraRender( $parser ) {
+		try {
+			$parsedEra = new Era(func_get_args());
+			return array(Era::renderEra($parsedEra), 'noparse' => false, 'nowiki' => false );
+		} catch(Exception $e) {
+			return array("* '''" . htmlspecialchars($e->getMessage()) . "'''", 'noparse' => false );
+		}
+	}
+	
 	public static function wfTimelineRender( $parser ) {
 		try {
 			$timeline = new Timeline($parser, func_get_args());
 			if("TABLE" === $timeline->getRenderMode()) {
 				return array(Event::renderEvents($timeline->getEvents(), true), 'noparse' => false, 'nowiki' => false );
 			} else if("TIMELINE" === $timeline->getRenderMode()) {
-				return array(Event::renderEventsTimeline($parser, $timeline->getEvents(),
+				return array(Event::renderEventsTimeline($parser, $timeline->getEvents(), $timeline->getEras(),
 						($timeline->getCalendarJSFormatter() != null ? $timeline->getCalendarJSFormatter() : "/default.js"),
 						true), 'noparse' => true, 'isHTML' => true, "markerType" => 'nowiki' );
 			} else {

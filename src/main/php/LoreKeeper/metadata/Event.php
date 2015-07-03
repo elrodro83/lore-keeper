@@ -119,7 +119,7 @@ class Event {
 		return $markUp;
 	}
 	
-	public static function renderEventsTimeline($parser, $parsedEvents, $calendarJSFormatter, $showTitle = false) {
+	public static function renderEventsTimeline($parser, $parsedEvents, $eras, $calendarJSFormatter, $showTitle = false) {
 		global $wgExtensionAssetsPath;
 		global $wgLanguageCode;
 		
@@ -128,6 +128,7 @@ class Event {
 		$timelineDataObject["headline"] = $parser->getTitle()->getBaseText();
 		$timelineDataObject["type"] = "default";
 		$timelineDataObject["date"] = array();
+		$timelineDataObject["era"] = array();
 		
 		foreach($parsedEvents as $parsedEvent) {
 			$timelineEvent = array();
@@ -153,6 +154,15 @@ class Event {
 			);
 				
 			array_push($timelineDataObject["date"], $timelineEvent);
+		}
+		foreach($eras as $era) {
+			$timelineEra = array();
+			
+			$timelineEra["startDate"] = date('Y,m,d', $era->getFrom()->getTimestamp());
+			$timelineEra["endDate"] = date('Y,m,d', $era->getTo()->getTimestamp());
+			$timelineEra["headline"] = $era->getName();
+				
+			array_push($timelineDataObject["era"], $timelineEra);
 		}
 		
 		$dataObject = json_encode($timelineDataObject);
