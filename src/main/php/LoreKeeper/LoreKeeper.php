@@ -30,6 +30,8 @@ $dir = dirname( __FILE__ );
 $dirbasename = basename( $dir );
 
 $wgAutoloadClasses['LoreKeeper'] = $dir . '/LoreKeeper.body.php';
+$wgAutoloadClasses['PageFetchUtils'] = $dir . '/util/PageFetchUtils.php';
+$wgAutoloadClasses['ParserUtils'] = $dir . '/util/ParserUtils.php';
 $wgAutoloadClasses['Calendar'] = $dir . '/metadata/Calendar.php';
 $wgAutoloadClasses['InPageCalendar'] = $dir . '/metadata/InPageCalendar.php';
 $wgAutoloadClasses['LKDate'] = $dir . '/metadata/LKDate.php';

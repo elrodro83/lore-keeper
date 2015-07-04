@@ -5,10 +5,14 @@ class Event {
 	private $sectionTitle = "";
 
 	private $categories = array();
+	private $outgoingLinks = array();
+	
 	private $when = "";
 	private $where = "";
 	private $who = array();
 	private $what = array();
+	
+	private $body = "";
 	
 	function __construct($args) {
 		//Suppose the user invoked the parser function like so:
@@ -24,7 +28,7 @@ class Event {
 		//	[1] => 'apple=orange'
 	
 		//Now we need to transform $opts into a more useful form...
-		$this->extractOptions( $opts );
+		$this->extractOptions( $args[0], $opts );
 	}
 	
 	/**
@@ -34,7 +38,7 @@ class Event {
 	 * @param array string $options
 	 * @return array $results
 	 */
-	public function extractOptions( array $options ) {
+	public function extractOptions( $parser, array $options ) {
 		foreach ( $options as $option ) {
 			$pair = explode( '=', $option, 2 );
 			if ( count( $pair ) == 2 ) {
@@ -48,6 +52,15 @@ class Event {
 					$this->where = $value;
 				} else if("what" == $name) {
 					array_push($this->what, $value);
+				}
+				
+				$outgoingLinks = array();
+				preg_match_all("/\[\[([^\]]*)\]\]/", $value, $outgoingLinks);
+				
+				foreach ($outgoingLinks[1] as $outgoingLink) {
+					if($parser->getTitle()->getBaseText() != $outgoingLink) {
+						array_push($this->outgoingLinks, $outgoingLink);
+					}
 				}
 			}
 		}
@@ -96,7 +109,7 @@ class Event {
 			if($showTitle) {
 				$markUp .= "| " . $parsedEvent->getWikiLink() . "\n";
 				$markUp .= "| \n";
-				foreach(Event::filterKnowledgeCategories($parsedEvent->categories) as $category) {
+				foreach(PageFetchUtils::filterKnowledgeCategories($parsedEvent->categories) as $category) {
 					$markUp .= "* [[:Category:$category|$category]]\n";
 				}
 			}
@@ -141,18 +154,23 @@ class Event {
 			
 			$eventProcessed = $parser->doBlockLevels(
 					$parser->replaceInternalLinks(
-							$parser->recursiveTagParse(Event::renderEvents(array($parsedEvent), false, false))
+							$parser->recursiveTagParse(Event::renderEvents(array($parsedEvent), false, false)) . "\r\n" . $parsedEvent->getBody()
 						)
 				, false);
 			$parser->replaceLinkHolders($eventProcessed);
 			
 			$timelineEvent["text"] = $eventProcessed;
-			$timelineEvent["tag"] = Event::filterKnowledgeCategories($parsedEvent->categories);
+			$timelineEvent["tag"] = PageFetchUtils::filterKnowledgeCategories($parsedEvent->categories);
 			$timelineEvent["asset"] = array(
-					"thumbnail" => "optional-32x32px.jpg",
 					"caption" => $parsedEvent->pageTitle
 			);
-				
+			
+			$firstImageLink = $parsedEvent->getFirstImageFromOutgoingLinks($parser);
+			
+			if($firstImageLink != "") {
+				$timelineEvent["asset"]["thumbnail"] = ParserUtils::resolveImageLink($parser, $firstImageLink);
+			}
+			
 			array_push($timelineDataObject["date"], $timelineEvent);
 		}
 		foreach($eras as $era) {
@@ -183,36 +201,25 @@ class Event {
 		return $timelineHtml;
 	}
 	
-	private static function filterKnowledgeCategories($categoryNames) {
-		$prefixedCategories = array();
-		foreach($categoryNames as $categoryName) {
-			array_push($prefixedCategories, "Category:$categoryName");
-		}
-		
-		
-		// api.php?action=query&prop=categories&format=json&titles=Category%3AHistoria|Category%3ANaturaleza
-		$categoryInfoApi = new ApiMain( new FauxRequest(
-				array(
-						'action' => 'query',
-						'prop' => 'categories',
-						'format' => 'xml',
-						'titles' => implode("|", $prefixedCategories)),
-				true
-		) );
-		$categoryInfoApi->execute();
-		$categoryInfoData = & $categoryInfoApi->getResultData();
-		
-		$filtered = array();
-		foreach($categoryInfoData["query"]["pages"] as $categoryPage) {
-			foreach($categoryPage["categories"] as $category) {
-				$superCategory = explode(":", $category["title"])[1];
-				if(wfMessage("knowledgeCategory")->text() === $superCategory) {
-					array_push($filtered, explode(":", $categoryPage["title"])[1]);
-				}
+	private function getFirstImageFromOutgoingLinks($parser) {
+		foreach($this->getOutgoingLinks() as $outgoingLink) {
+			$outgoingPageId = CoreParserFunctions::pageid($parser, $outgoingLink);
+			$fetchedPage = PageFetchUtils::fetchPagesByIds(array($outgoingPageId));
+			if($fetchedPage == null) {
+				return "";
+			}
+			
+			$files = array();
+			foreach(PageFetchUtils::fetchPagesByIds(array($outgoingPageId)) as $linkedPage) {
+				$linkedPageContent = $linkedPage["revisions"][0]["*"];
+				$files = array_merge($files, ParserUtils::getFiles($linkedPageContent));
+			}
+			
+			if(count($files) > 0) {
+				return $files[0];
 			}
 		}
-		
-		return $filtered;
+		return "";
 	}
 	
 	public function setTitle($pageTitle, $sectionTitle) {
@@ -230,6 +237,10 @@ class Event {
 	
 	public function setCategories($categories) {
 		$this->categories = $categories;
+	}
+	
+	public function getOutgoingLinks() {
+		return $this->outgoingLinks;
 	}
 	
 	public function getWikiLink() {
@@ -266,6 +277,14 @@ class Event {
 	
 	public function getWhat() {
 		return $this->what;
+	}
+	
+	public function getBody() {
+		return $this->body;
+	}
+	
+	public function setBody($body) {
+		$this->body = $body;
 	}
 	
 }
