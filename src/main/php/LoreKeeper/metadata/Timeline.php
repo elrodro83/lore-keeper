@@ -30,12 +30,12 @@ class Timeline {
 		$this->extractOptions( $opts );
 		
 		$currentPageId = CoreParserFunctions::pageid($parser, $parser->getTitle()->getBaseText());
-		foreach($this->pages as $eventPageTitle) {
-			if($eventPageTitle === "_self") {
-				$eventPageTitle = $parser->getTitle()->getBaseText();
+		foreach($this->pages as $timelinePageTitle) {
+			if($timelinePageTitle === "_self") {
+				$timelinePageTitle = $parser->getTitle()->getBaseText();
 			}
 			
-			$pageids = PageFetchUtils::getBacklinkPagesIds($eventPageTitle);
+			$pageids = PageFetchUtils::getBacklinkPagesIds($timelinePageTitle);
 			if($currentPageId != null) {
 				array_push($pageids, $currentPageId);
 			}
@@ -44,15 +44,19 @@ class Timeline {
 				$backlinkTitle = $backlinkPage["title"];
 				$backlinkContent = $backlinkPage["revisions"][0]["*"];
 				
-				$this->processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent);
+				$this->processBacklinkPage($parser, $timelinePageTitle, $backlinkTitle, $backlinkContent);
 			}
 		}
 		
-		usort($this->events, "Timeline::eventTimestampCmp");
-		
 		foreach(PageFetchUtils::fetchPagesByIds(array($currentPageId)) as $currentPage) {
 			$selfContent = $currentPage["revisions"][0]["*"];
+			$selfTitle = $currentPage["title"];
 			
+			// Newly created pages do not yet have revisions.
+			if($selfContent != null) {
+				$this->processBacklinkPage($parser, $parser->getTitle()->getBaseText(), $selfTitle, $selfContent);
+			}
+
 			$rawEras = [];
 			preg_match_all("/{{#era:([^}}]*)}}/m", $selfContent, $rawEras);
 			
@@ -64,11 +68,13 @@ class Timeline {
 				array_push($this->eras, $parsedEra);
 			}
 		}
+	 	
+		usort($this->events, "Timeline::eventTimestampCmp");
 	}
 	
 	private function processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent) {
 		foreach(ParserUtils::parseEvents($parser, $backlinkTitle, $backlinkContent) as $event) {
-			if($event->hasLinksTo($eventPageTitle) && $this->checkDate($event->getWhen())) {
+			if(($event->hasLinksTo($eventPageTitle) || $eventPageTitle === $backlinkTitle) && $this->checkDate($event->getWhen())) {
 				$event->setCategories(ParserUtils::getCategories($backlinkContent));
 
 				if($this->calendarQualifier != null) {

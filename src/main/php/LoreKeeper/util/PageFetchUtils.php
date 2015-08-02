@@ -64,10 +64,13 @@ class PageFetchUtils {
 	
 		$filtered = array();
 		foreach($categoryInfoData["query"]["pages"] as $categoryPage) {
-			foreach($categoryPage["categories"] as $category) {
-				$superCategory = explode(":", $category["title"])[1];
-				if(wfMessage("knowledgeCategory")->text() === $superCategory) {
-					array_push($filtered, explode(":", $categoryPage["title"])[1]);
+			// This is null for categories that are used but do not have its page createds yet
+			if($categoryPage["categories"] != null) {
+				foreach($categoryPage["categories"] as $category) {
+					$superCategory = explode(":", $category["title"])[1];
+					if(wfMessage("knowledgeCategory")->text() === $superCategory) {
+						array_push($filtered, explode(":", $categoryPage["title"])[1]);
+					}
 				}
 			}
 		}
