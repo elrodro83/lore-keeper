@@ -7,6 +7,8 @@ class Era {
 	private $from = "";
 	private $to = "";
 	
+	private $thumb = "";
+	
 	function __construct($args) {
 		//Suppose the user invoked the parser function like so:
 		//{{#myparserfunction:foo=bar|apple=orange}}
@@ -73,5 +75,13 @@ class Era {
 	
 	public function getTo() {
 		return $this->to;
+	}
+	
+	public function setThumb($thumb) {
+		$this->thumb = $thumb;
+	}
+	
+	public function getThumb() {
+		return $this->thumb;
 	}
 }

@@ -59,7 +59,7 @@ class Event {
 				}
 				
 				$outgoingLinks = array();
-				preg_match_all("/\[\[([^\]]*)\]\]/", $value, $outgoingLinks);
+				preg_match_all("/\[\[([^\]\|]*)(?:|[^\]]*)\]\]/", $value, $outgoingLinks);
 				
 				foreach ($outgoingLinks[1] as $outgoingLink) {
 					if($parser->getTitle()->getBaseText() != $outgoingLink) {
@@ -222,6 +222,8 @@ class Event {
 	        $files = array();
 	        foreach(PageFetchUtils::fetchPagesByIds(array($outgoingPageId)) as $linkedPage) {
 	            $linkedPageContent = $linkedPage["revisions"][0]["*"];
+	            
+	            // TODO: Get thumbnail matching the event date to the eras
 	            $files = array_merge($files, ParserUtils::getFiles($linkedPageContent));
 	        }
 	        
