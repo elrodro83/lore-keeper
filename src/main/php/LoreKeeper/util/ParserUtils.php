@@ -26,6 +26,27 @@ class ParserUtils {
 		return $imgs;
 	}
 
+	public static function getEras($pageMarkup) {
+		$rawEras = array();
+		
+		preg_match_all("/{{#era:([^}}]*)}}([^{]*)/", $pageMarkup, $rawEras);
+
+		$parsedEras = array();
+		for ($i = 0; $i < count($rawEras[1]); $i++) {
+			$rawEra = $rawEras[1][$i];
+			$eraBody = $rawEras[2][$i];
+
+			$parsedEra = new Era(array_merge([$parser],
+			preg_split("/\|(?=name|from|to)/",
+					str_replace(array("\r\n", "\n", "\r"), "", $rawEra))));
+			$parsedEra->setThumb(ParserUtils::getFiles($eraBody)[0]);
+			
+			array_push($parsedEras, $parsedEra);
+		}
+		
+		return $parsedEras;
+	}
+	
 	public static function parseEvents($parser, $pageTitle, $pageMarkup) {
 		$events = array();
 		preg_match_all("/={2,} ([^=]{2,}) ={2,}[^=]{2,}{{#event:([^}}]*)}}([^=]*)/", $pageMarkup, $events);

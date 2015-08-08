@@ -57,16 +57,7 @@ class Timeline {
 				$this->processBacklinkPage($parser, $parser->getTitle()->getBaseText(), $selfTitle, $selfContent);
 			}
 
-			$rawEras = [];
-			preg_match_all("/{{#era:([^}}]*)}}/m", $selfContent, $rawEras);
-			
-			foreach($rawEras[1] as $rawEra) {
-				$parsedEra = new Era(array_merge([$parser],
-						preg_split("/\|(?=name|from|to)/",
-								str_replace(array("\r\n", "\n", "\r"), "", $rawEra))));
-
-				array_push($this->eras, $parsedEra);
-			}
+			$this->eras = ParserUtils::getEras($selfContent);
 		}
 	 	
 		usort($this->events, "Timeline::eventTimestampCmp");
