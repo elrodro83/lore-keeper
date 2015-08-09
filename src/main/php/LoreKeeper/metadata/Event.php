@@ -175,7 +175,7 @@ class Event {
 					"caption" => $parsedEvent->pageTitle
 			);
 			
-			$firstImageLink = $parsedEvent->getFirstImageFromOutgoingLinks($parser);
+			$firstImageLink = $parsedEvent->getFirstImageFromOutgoingLinks($parser, $parsedEvent->getWhen()->getTimestamp());
 			
 			if($firstImageLink != "") {
 				$timelineEvent["asset"]["thumbnail"] = ParserUtils::resolveImageLink($parser, $firstImageLink);
@@ -211,7 +211,7 @@ class Event {
 		return $timelineHtml;
 	}
 	
-	private function getFirstImageFromOutgoingLinks($parser) {
+	private function getFirstImageFromOutgoingLinks($parser, $eventWhen) {
 	    foreach($this->getOutgoingLinks() as $outgoingLink) {
 	        $outgoingPageId = CoreParserFunctions::pageid($parser, $outgoingLink);
 	        $fetchedPage = PageFetchUtils::fetchPagesByIds(array($outgoingPageId));
@@ -223,8 +223,17 @@ class Event {
 	        foreach(PageFetchUtils::fetchPagesByIds(array($outgoingPageId)) as $linkedPage) {
 	            $linkedPageContent = $linkedPage["revisions"][0]["*"];
 	            
-	            // TODO: Get thumbnail matching the event date to the eras
-	            $files = array_merge($files, ParserUtils::getFiles($linkedPageContent));
+	            $outgoingEras = ParserUtils::getEras($linkedPageContent);
+	            if(empty($outgoingEras)) {
+	                $files = array_merge($files, ParserUtils::getFiles($linkedPageContent));
+	            } else {
+	                // Get thumbnail matching the event date to the eras
+	                foreach($outgoingEras as $era) {
+	                    if($era->containsDate($eventWhen)) {
+	                        array_push($files, $era->getThumb());
+	                    }
+	                }
+	            }
 	        }
 	        
 	        if(count($files) > 0) {

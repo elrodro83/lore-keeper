@@ -60,6 +60,10 @@ class Era {
 			throw new Exception("Missing mandatory 'name' data: " . json_encode($options));
 		}
 	}
+	
+	public function containsDate($date) {
+		return $date >= $this->from->getTimestamp() && $date <= $this->to->getTimestamp();
+	}
 
 	public static function renderEra($parsedEra) {
 		return "";
