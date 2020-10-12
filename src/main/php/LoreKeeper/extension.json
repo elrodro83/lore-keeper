@@ -13,6 +13,7 @@
 		"Calendar": "metadata/Calendar.php",
 		"InPageCalendar": "metadata/InPageCalendar.php",
 		"LKDate": "metadata/LKDate.php",
+		"Era" "metadata/Era.php",
 		"Event": "metadata/Event.php",
 		"Timeline": "metadata/Timeline.php"
 	},
