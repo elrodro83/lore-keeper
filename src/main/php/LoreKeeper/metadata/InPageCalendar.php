@@ -5,24 +5,22 @@ class InPageCalendar {
 	public static function fetchCalendar($eraQualifier) {
 		global $wgLoreKeeperCalendarPage;
 	
-		$title = Title::newFromText( $wgLoreKeeperCalendarPage );
-		$rev = Revision::newFromTitle( $title );
-		$id = $rev ? $rev->getPage() : 0;
-	
 		$calendarContentApi = new ApiMain( new FauxRequest(
 				array(
 						'action' => 'query',
 						'prop' => 'revisions',
 						'format' => 'xml',
 						'rvprop' => 'content',
-						'pageids' => $id),
+						'rvslots' => '*',
+						'titles' => $wgLoreKeeperCalendarPage),
 				true
 		) );
 		$calendarContentApi->execute();
-		$calendarContentData = & $calendarContentApi->getResultData();
-	
-		$calendarPageMarkUp = $calendarContentData["query"]["pages"][$id]["revisions"][0]["*"];
-	
+		$calendarContentData = & $calendarContentApi->getResult()->getResultData();
+
+		foreach($calendarContentData["query"]["pages"] as $page) break;
+		$calendarPageMarkUp = $page["revisions"][0]["slots"]["main"]["content"];
+
 		$rawCalendars = [];
 		preg_match_all("/{{#calendar:([^}}]*)}}/", $calendarPageMarkUp, $rawCalendars);
 		foreach($rawCalendars[1] as $rawCalendar) {

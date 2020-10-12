@@ -34,10 +34,12 @@ class Timeline {
 			}
 			
 			foreach($this->fetchBacklinkPages($parser, $eventPageTitle) as $backlinkPage) {
-				$backlinkTitle = $backlinkPage["title"];
-				$backlinkContent = $backlinkPage["revisions"][0]["*"];
-				
-				$this->processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent);
+				if(is_array($backlinkPage)) {
+					$backlinkTitle = $backlinkPage["title"];
+					$backlinkContent = $backlinkPage["revisions"][0]["slots"]["main"]["content"];
+					
+					$this->processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent);
+				}
 			}
 		}
 		
@@ -126,28 +128,33 @@ class Timeline {
 				true
 		) );
 		$backlinksApi->execute();
-		$backlinksData = & $backlinksApi->getResultData();
+		$backlinksData = & $backlinksApi->getResult()->getResultData();
 		
 		$pageids = [];
+
 		foreach($backlinksData["query"]["backlinks"] as $backlink) {
-			array_push($pageids, $backlink["pageid"]);
+			if(is_array($backlink)) {
+				array_push($pageids, $backlink["pageid"]);
+			}
 		}
+
 		$currentPageId = CoreParserFunctions::pageid($parser, $pageTitle);
 		if($currentPageId != null) {
 			array_push($pageids, $currentPageId);
 		}
-		
+
 		$blContentApi = new ApiMain( new FauxRequest(
 				array(
 						'action' => 'query',
 						'prop' => 'revisions',
 						'format' => 'xml',
 						'rvprop' => 'content',
+						'rvslots' => '*',
 						'pageids' => implode("|", $pageids)),
 				true
 		) );
 		$blContentApi->execute();
-		$blContentData = & $blContentApi->getResultData();
+		$blContentData = & $blContentApi->getResult()->getResultData();
 		return $blContentData["query"]["pages"];
 	}
 	

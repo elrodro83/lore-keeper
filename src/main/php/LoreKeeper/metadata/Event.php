@@ -22,7 +22,7 @@ class Event {
 		//The $opts array now looks like this:
 		//	[0] => 'foo=bar'
 		//	[1] => 'apple=orange'
-	
+
 		//Now we need to transform $opts into a more useful form...
 		$this->extractOptions( $opts );
 	}
@@ -51,6 +51,7 @@ class Event {
 				}
 			}
 		}
+
 		//Now you've got an array that looks like this:
 		//	[foo] => bar
 		//	[apple] => orange
@@ -116,6 +117,7 @@ class Event {
 		}
 			
 		$markUp .= "|}";
+
 		return $markUp;
 	}
 	
@@ -133,17 +135,14 @@ class Event {
 			$timelineEvent = array();
 			
 			$externalLink = $parsedEvent->getExternalLink($parser);
-			$parser->replaceLinkHolders($externalLink);
 			
 			$timelineEvent["startDate"] = date('Y,m,d', $parsedEvent->getWhen()->getTimestamp());
 			$timelineEvent["headline"] = $externalLink;
-			
-			$eventProcessed = $parser->doBlockLevels(
-					$parser->replaceInternalLinks(
-							$parser->recursiveTagParse(Event::renderEvents(array($parsedEvent), false, false))
-						)
-				, false);
-			$parser->replaceLinkHolders($eventProcessed);
+
+			$eventProcessed = #$parser->doBlockLevels(
+					$parser->parse(
+						Event::renderEvents(array($parsedEvent), false, false),
+						$parser->getTitle(), new ParserOptions(), false, false, 0 )->getText();
 			
 			$timelineEvent["text"] = $eventProcessed;
 			$timelineEvent["tag"] = Event::filterKnowledgeCategories($parsedEvent->categories);
@@ -190,14 +189,18 @@ class Event {
 				true
 		) );
 		$categoryInfoApi->execute();
-		$categoryInfoData = & $categoryInfoApi->getResultData();
+		$categoryInfoData = & $categoryInfoApi->getResult()->getResultData();
 		
 		$filtered = array();
 		foreach($categoryInfoData["query"]["pages"] as $categoryPage) {
-			foreach($categoryPage["categories"] as $category) {
-				$superCategory = explode(":", $category["title"])[1];
-				if(wfMessage("knowledgeCategory")->text() === $superCategory) {
-					array_push($filtered, explode(":", $categoryPage["title"])[1]);
+			if(is_array($categoryPage)) {
+				foreach($categoryPage["categories"] as $category) {
+					if(is_array($category)) {
+						$superCategory = explode(":", $category["title"])[1];
+						if(wfMessage("knowledgeCategory")->text() === $superCategory) {
+							array_push($filtered, explode(":", $categoryPage["title"])[1]);
+						}
+					}
 				}
 			}
 		}
@@ -235,7 +238,8 @@ class Event {
 	 * @param unknown $parser
 	 */
 	public function getExternalLink($parser) {
-		return $parser->replaceInternalLinks($this->getWikiLink());
+#		$title = Title::newFromText($this->pageTitle);
+		return $parser->parse($this->getWikiLink(), $parser->getTitle(), new ParserOptions(), false, false, 0 )->getText();
 	}
 	
 	public function setWhen($when) {
