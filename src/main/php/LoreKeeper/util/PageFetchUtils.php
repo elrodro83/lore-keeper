@@ -9,11 +9,12 @@ class PageFetchUtils {
 						'prop' => 'revisions',
 						'format' => 'xml',
 						'rvprop' => 'content',
+						'rvslots' => '*',
 						'pageids' => implode("|", $pageids)),
 				true
 		) );
 		$blContentApi->execute();
-		$blContentData = & $blContentApi->getResultData();
+		$blContentData = & $blContentApi->getResult()->getResultData();
 		return $blContentData["query"]["pages"];
 	}
 	
@@ -29,11 +30,13 @@ class PageFetchUtils {
 				true
 		) );
 		$backlinksApi->execute();
-		$backlinksData = & $backlinksApi->getResultData();
+		$backlinksData = & $backlinksApi->getResult()->getResultData();
 	
 		$pageids = [];
 		foreach($backlinksData["query"]["backlinks"] as $backlink) {
-			array_push($pageids, $backlink["pageid"]);
+			if(is_array($backlink)) {
+				array_push($pageids, $backlink["pageid"]);
+			}
 		}
 	
 		return $pageids;
@@ -60,16 +63,20 @@ class PageFetchUtils {
 				true
 		) );
 		$categoryInfoApi->execute();
-		$categoryInfoData = & $categoryInfoApi->getResultData();
+		$categoryInfoData = & $categoryInfoApi->getResult()->getResultData();
 	
 		$filtered = array();
 		foreach($categoryInfoData["query"]["pages"] as $categoryPage) {
-			// This is null for categories that are used but do not have its page createds yet
-			if($categoryPage["categories"] != null) {
-				foreach($categoryPage["categories"] as $category) {
-					$superCategory = explode(":", $category["title"])[1];
-					if(wfMessage("knowledgeCategory")->text() === $superCategory) {
-						array_push($filtered, explode(":", $categoryPage["title"])[1]);
+			if(is_array($categoryPage)) {
+				// This is null for categories that are used but do not have its page createds yet
+				if($categoryPage["categories"] != null) {
+					foreach($categoryPage["categories"] as $category) {
+						if(is_array($category)) {
+							$superCategory = explode(":", $category["title"])[1];
+							if(wfMessage("knowledgeCategory")->text() === $superCategory) {
+								array_push($filtered, explode(":", $categoryPage["title"])[1]);
+							}
+						}
 					}
 				}
 			}
