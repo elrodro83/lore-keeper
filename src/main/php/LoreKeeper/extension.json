@@ -10,6 +10,8 @@
 	},
 	"AutoloadClasses": {
 		"LoreKeeper": "LoreKeeper.body.php",
+		"PageFetchUtils": "util/PageFetchUtils.php",
+		"ParserUtils": "util/ParserUtils.php",
 		"Calendar": "metadata/Calendar.php",
 		"InPageCalendar": "metadata/InPageCalendar.php",
 		"LKDate": "metadata/LKDate.php",
