@@ -26,7 +26,7 @@ class Event {
 		//The $opts array now looks like this:
 		//	[0] => 'foo=bar'
 		//	[1] => 'apple=orange'
-	
+
 		//Now we need to transform $opts into a more useful form...
 		$this->extractOptions( $args[0], $opts );
 	}
@@ -64,6 +64,7 @@ class Event {
 				}
 			}
 		}
+
 		//Now you've got an array that looks like this:
 		//	[foo] => bar
 		//	[apple] => orange
@@ -129,6 +130,7 @@ class Event {
 		}
 			
 		$markUp .= "|}";
+
 		return $markUp;
 	}
 	
@@ -147,17 +149,14 @@ class Event {
 			$timelineEvent = array();
 			
 			$externalLink = $parsedEvent->getExternalLink($parser);
-			$parser->replaceLinkHolders($externalLink);
 			
 			$timelineEvent["startDate"] = date('Y,m,d', $parsedEvent->getWhen()->getTimestamp());
 			$timelineEvent["headline"] = $externalLink;
-			
-			$eventProcessed = $parser->doBlockLevels(
-					$parser->replaceInternalLinks(
-							$parser->recursiveTagParse(Event::renderEvents(array($parsedEvent), false, false)) . "\r\n" . $parsedEvent->getBody()
-						)
-				, false);
-			$parser->replaceLinkHolders($eventProcessed);
+
+      $eventProcessed =
+					$parser->parse(
+						Event::renderEvents(array($parsedEvent), false, false) . "\r\n" . $parsedEvent->getBody(),
+						$parser->getTitle(), new ParserOptions(), false, false, 0 )->getText();
 			
 			$timelineEvent["text"] = $eventProcessed;
 			$timelineEvent["tag"] = PageFetchUtils::filterKnowledgeCategories($parsedEvent->categories);
@@ -267,7 +266,7 @@ class Event {
 	 * @param unknown $parser
 	 */
 	public function getExternalLink($parser) {
-		return $parser->replaceInternalLinks($this->getWikiLink());
+		return $parser->parse($this->getWikiLink(), $parser->getTitle(), new ParserOptions(), false, false, 0 )->getText();
 	}
 	
 	public function setWhen($when) {
@@ -297,5 +296,4 @@ class Event {
 	public function setBody($body) {
 		$this->body = $body;
 	}
-	
 }

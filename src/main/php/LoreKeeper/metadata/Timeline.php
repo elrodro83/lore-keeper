@@ -41,10 +41,12 @@ class Timeline {
 			}
 			
 			foreach(PageFetchUtils::fetchPagesByIds($pageids) as $backlinkPage) {
-				$backlinkTitle = $backlinkPage["title"];
-				$backlinkContent = $backlinkPage["revisions"][0]["*"];
-				
-				$this->processBacklinkPage($parser, $timelinePageTitle, $backlinkTitle, $backlinkContent);
+				if(is_array($backlinkPage)) {
+					$backlinkTitle = $backlinkPage["title"];
+					$backlinkContent = $backlinkPage["revisions"][0]["slots"]["main"]["content"];
+					
+					$this->processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent);
+				}
 			}
 		}
 		
