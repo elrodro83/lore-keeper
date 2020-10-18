@@ -39,27 +39,29 @@ class Timeline {
 			if($currentPageId != null) {
 				array_push($pageids, $currentPageId);
 			}
-			
+
 			foreach(PageFetchUtils::fetchPagesByIds($pageids) as $backlinkPage) {
 				if(is_array($backlinkPage)) {
 					$backlinkTitle = $backlinkPage["title"];
 					$backlinkContent = $backlinkPage["revisions"][0]["slots"]["main"]["content"];
-					
-					$this->processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent);
+
+					$this->processBacklinkPage($parser, $timelinePageTitle, $backlinkTitle, $backlinkContent);
 				}
 			}
 		}
 		
 		foreach(PageFetchUtils::fetchPagesByIds(array($currentPageId)) as $currentPage) {
-			$selfContent = $currentPage["revisions"][0]["*"];
-			$selfTitle = $currentPage["title"];
+			if(is_array($currentPage)) {
+				$selfContent = $currentPage["revisions"][0]["slots"]["main"]["content"];
+				$selfTitle = $currentPage["title"];
 			
-			// Newly created pages do not yet have revisions.
-			if($selfContent != null) {
-				$this->processBacklinkPage($parser, $parser->getTitle()->getBaseText(), $selfTitle, $selfContent);
-			}
+				// Newly created pages do not yet have revisions.
+				if($selfContent != null) {
+					$this->processBacklinkPage($parser, $parser->getTitle()->getBaseText(), $selfTitle, $selfContent);
+				}
 
-			$this->eras = ParserUtils::getEras($selfContent);
+				$this->eras = ParserUtils::getEras($selfContent);
+			}
 		}
 	 	
 		usort($this->events, "Timeline::eventTimestampCmp");
@@ -67,6 +69,7 @@ class Timeline {
 	
 	private function processBacklinkPage($parser, $eventPageTitle, $backlinkTitle, $backlinkContent) {
 		foreach(ParserUtils::parseEvents($parser, $backlinkTitle, $backlinkContent) as $event) {
+
 			if(($event->hasLinksTo($eventPageTitle) || $eventPageTitle === $backlinkTitle) && $this->checkDate($event->getWhen())) {
 				$event->setCategories(ParserUtils::getCategories($backlinkContent));
 
