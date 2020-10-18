@@ -91,7 +91,7 @@ class Event {
 				return true;
 			}
 		}
-		
+
 		return preg_match("/\[\[$pageTile(?:\|(.*))?\]\]/", $this->where) > 0;
 	}
 	
@@ -221,18 +221,20 @@ class Event {
 	        
 	        $files = array();
 	        foreach(PageFetchUtils::fetchPagesByIds(array($outgoingPageId)) as $linkedPage) {
-	            $linkedPageContent = $linkedPage["revisions"][0]["*"];
-	            
-	            $outgoingEras = ParserUtils::getEras($linkedPageContent);
-	            if(empty($outgoingEras)) {
-	                $files = array_merge($files, ParserUtils::getFiles($linkedPageContent));
-	            } else {
-	                // Get thumbnail matching the event date to the eras
-	                foreach($outgoingEras as $era) {
-	                    if($era->containsDate($eventWhen)) {
-	                        array_push($files, $era->getThumb());
-	                    }
-	                }
+	            if(is_array($linkedPage)) {
+	                $linkedPageContent = $linkedPage["revisions"][0]["slots"]["main"]["content"];
+	                
+		            $outgoingEras = ParserUtils::getEras($linkedPageContent);
+		            if(empty($outgoingEras)) {
+	    	            $files = array_merge($files, ParserUtils::getFiles($linkedPageContent));
+	        	    } else {
+	            	    // Get thumbnail matching the event date to the eras
+	                	foreach($outgoingEras as $era) {
+	                    	if($era->containsDate($eventWhen)) {
+	                        	array_push($files, $era->getThumb());
+		                    }
+		                }
+	        	    }
 	            }
 	        }
 	        
