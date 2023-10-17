@@ -1,5 +1,8 @@
 <?php 
 
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Revision\RevisionLookup;
+
 class Timeline {
 	
 	private $pages = array("_self");
@@ -83,8 +86,9 @@ class Timeline {
 		
 		// 			http://www.mediawiki.org/wiki/Manual:Tag_extensions#Regenerating_the_page_when_another_page_is_edited
 		$title = Title::newFromText( $backlinkTitle );
-		$rev = Revision::newFromTitle( $title );
+		$rev = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title );
 		$id = $rev ? $rev->getPage() : 0;
+
 		// Register dependency in templatelinks
 		$parser->getOutput()->addTemplate( $title, $id, $rev ? $rev->getId() : 0 );
 	}

@@ -153,10 +153,10 @@ class Event {
 			$timelineEvent["startDate"] = date('Y,m,d', $parsedEvent->getWhen()->getTimestamp());
 			$timelineEvent["headline"] = $externalLink;
 
-      $eventProcessed =
+			$eventProcessed =
 					$parser->parse(
 						Event::renderEvents(array($parsedEvent), false, false) . "\r\n" . $parsedEvent->getBody(),
-						$parser->getTitle(), new ParserOptions(), false, false, 0 )->getText();
+						$parser->getTitle(), ParserOptions::newFromAnon(), false, false, 0 )->getText();
 			
 			$timelineEvent["text"] = $eventProcessed;
 			$timelineEvent["tag"] = PageFetchUtils::filterKnowledgeCategories($parsedEvent->categories);
@@ -268,7 +268,7 @@ class Event {
 	 * @param unknown $parser
 	 */
 	public function getExternalLink($parser) {
-		return $parser->parse($this->getWikiLink(), $parser->getTitle(), new ParserOptions(), false, false, 0 )->getText();
+		return $parser->parse($this->getWikiLink(), $parser->getTitle(), ParserOptions::newFromAnon(), false, false, 0 )->getText();
 	}
 	
 	public function setWhen($when) {
