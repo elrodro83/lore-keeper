@@ -1,6 +1,7 @@
 <?php
 
 use MediaWiki\Parser\ParserOptions;
+use MediaWiki\ParserOutputTransform\DefaultOutputTransform;
 use MediaWiki\Request\FauxRequest;
 
 class Event {
@@ -244,7 +245,10 @@ class Event {
 	public function getExternalLink($parser) {
 		$parserOptions = ParserOptions::newFromAnon();
 #		$title = Title::newFromText($this->pageTitle);
-		return $parser->parse($this->getWikiLink(), $parser->getTitle(), $parserOptions, false, false, 0 )->getText();
+		$parserOutput = $parser->parse($this->getWikiLink(), $parser->getTitle(), $parserOptions, false, false, 0 )->getText();
+
+		$transformedOutput = DefaultOutputTransform::transform( $parserOutput, $parserOptions );
+        return $transformedOutput->getHtmlOrDom()->getText();
 	}
 	
 	public function setWhen($when) {
