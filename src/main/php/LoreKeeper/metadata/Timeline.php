@@ -1,5 +1,7 @@
 <?php 
 
+use MediaWiki\Request\FauxRequest;
+
 class Timeline {
 	
 	private $pages = array("_self");
