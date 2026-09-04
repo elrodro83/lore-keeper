@@ -244,7 +244,7 @@ class Event {
 	public function getExternalLink($parser) {
 		$parserOptions = ParserOptions::newFromAnon();
 #		$title = Title::newFromText($this->pageTitle);
-		return $parser->parse($this->getWikiLink(), $parser->getTitle(), $parserOptions, false, false, 0 )->getRaw();
+		return $parser->parse($this->getWikiLink(), $parser->getTitle(), $parserOptions, false, false, 0 )->getRawText();
 	}
 	
 	public function setWhen($when) {
