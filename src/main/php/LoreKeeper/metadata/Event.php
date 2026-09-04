@@ -1,6 +1,6 @@
 <?php
 
-use MediaWiki\MediaWikiServices;
+use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Request\FauxRequest;
 
 class Event {
@@ -242,7 +242,7 @@ class Event {
 	 * @param unknown $parser
 	 */
 	public function getExternalLink($parser) {
-		$parserOptions = MediaWikiServices::getInstance()->getParserFactory()->create()->getOptions();
+		$parserOptions = ParserOptions::newFromAnon();
 #		$title = Title::newFromText($this->pageTitle);
 		return $parser->parse($this->getWikiLink(), $parser->getTitle(), $parserOptions, false, false, 0 )->getText();
 	}
