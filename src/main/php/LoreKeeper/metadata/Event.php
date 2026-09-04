@@ -196,9 +196,9 @@ class Event {
 		$categoryInfoData = $categoryInfoApi->getResult()->getResultData();
 		
 		$filtered = array();
-		foreach($categoryInfoData["query"]["pages"] as $categoryPage) {
+		foreach($categoryInfoData["query"]["pages"] ?? [] as $categoryPage) {
 			if(is_array($categoryPage)) {
-				foreach($categoryPage["categories"] as $category) {
+				foreach($categoryPage["categories"] ?? [] as $category) {
 					if(is_array($category)) {
 						$superCategory = explode(":", $category["title"])[1];
 						if(wfMessage("knowledgeCategory")->text() === $superCategory) {
