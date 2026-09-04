@@ -245,7 +245,7 @@ class Event {
 	public function getExternalLink($parser) {
 		$parserOptions = ParserOptions::newFromAnon();
 #		$title = Title::newFromText($this->pageTitle);
-		$parserOutput = $parser->parse($this->getWikiLink(), $parser->getTitle(), $parserOptions, false, false, 0 )->getText();
+		$parserOutput = $parser->parse($this->getWikiLink(), $parser->getTitle(), $parserOptions, false, false, 0 )-;
 
 		$transformedOutput = DefaultOutputTransform::transform( $parserOutput, $parserOptions );
         return $transformedOutput->getHtmlOrDom()->getText();
