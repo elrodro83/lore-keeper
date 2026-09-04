@@ -1,5 +1,7 @@
 <?php 
 
+use MediaWiki\Request\FauxRequest;
+
 class InPageCalendar {
 
 	public static function fetchCalendar($eraQualifier) {
