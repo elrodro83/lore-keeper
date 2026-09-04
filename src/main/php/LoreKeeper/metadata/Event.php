@@ -193,7 +193,7 @@ class Event {
 				true
 		) );
 		$categoryInfoApi->execute();
-		$categoryInfoData = & $categoryInfoApi->getResult()->getResultData();
+		$categoryInfoData = $categoryInfoApi->getResult()->getResultData();
 		
 		$filtered = array();
 		foreach($categoryInfoData["query"]["pages"] as $categoryPage) {
