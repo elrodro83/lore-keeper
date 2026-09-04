@@ -133,7 +133,7 @@ class Timeline {
 				true
 		) );
 		$backlinksApi->execute();
-		$backlinksData = & $backlinksApi->getResult()->getResultData();
+		$backlinksData = $backlinksApi->getResult()->getResultData();
 		
 		$pageids = [];
 
