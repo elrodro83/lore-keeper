@@ -146,7 +146,7 @@ class Event {
 			$eventProcessed = #$parser->doBlockLevels(
 					$parser->parse(
 						Event::renderEvents(array($parsedEvent), false, false),
-						$parser->getTitle(), new ParserOptions(), false, false, 0 )->getText();
+						$parser->getTitle(), ParserOptions::newFromAnon(), false, false, 0 )->getText();
 			
 			$timelineEvent["text"] = $eventProcessed;
 			$timelineEvent["tag"] = Event::filterKnowledgeCategories($parsedEvent->categories);
@@ -242,9 +242,8 @@ class Event {
 	 * @param unknown $parser
 	 */
 	public function getExternalLink($parser) {
-		$parserOptions = ParserOptions::newFromAnon();
 #		$title = Title::newFromText($this->pageTitle);
-		return $parser->parse($this->getWikiLink(), $parser->getTitle(), $parserOptions, false, false, 0 )->getRawText();
+		return $parser->parse($this->getWikiLink(), $parser->getTitle(), ParserOptions::newFromAnon(), false, false, 0 )->getRawText();
 	}
 	
 	public function setWhen($when) {
