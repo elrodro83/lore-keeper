@@ -1,5 +1,5 @@
 {
-	"name": "LoreKeeper"
+	"name": "LoreKeeper",
 	"requires": {
 		"MediaWiki": ">= 1.35.0"
 	},
