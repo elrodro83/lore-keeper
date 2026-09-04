@@ -1,5 +1,9 @@
 <?php 
 
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Request\FauxRequest;
+use MediaWiki\Title\Title;
+
 class Timeline {
 	
 	private $pages = array("_self");
@@ -74,7 +78,8 @@ class Timeline {
 		
 		// 			http://www.mediawiki.org/wiki/Manual:Tag_extensions#Regenerating_the_page_when_another_page_is_edited
 		$title = Title::newFromText( $backlinkTitle );
-		$rev = Revision::newFromTitle( $title );
+		$revisionLookup = MediaWikiServices::getInstance()->getRevisionLookup();
+		$rev = $revisionLookup->getRevisionByTitle( $title );
 		$id = $rev ? $rev->getPage() : 0;
 		// Register dependency in templatelinks
 		$parser->getOutput()->addTemplate( $title, $id, $rev ? $rev->getId() : 0 );
@@ -128,7 +133,7 @@ class Timeline {
 				true
 		) );
 		$backlinksApi->execute();
-		$backlinksData = & $backlinksApi->getResult()->getResultData();
+		$backlinksData = $backlinksApi->getResult()->getResultData();
 		
 		$pageids = [];
 
@@ -154,7 +159,7 @@ class Timeline {
 				true
 		) );
 		$blContentApi->execute();
-		$blContentData = & $blContentApi->getResult()->getResultData();
+		$blContentData = $blContentApi->getResult()->getResultData();
 		return $blContentData["query"]["pages"];
 	}
 	

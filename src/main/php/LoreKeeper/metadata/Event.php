@@ -1,4 +1,8 @@
 <?php
+
+use MediaWiki\Parser\ParserOptions;
+use MediaWiki\Request\FauxRequest;
+
 class Event {
 	
 	private $pageTitle = "";
@@ -142,7 +146,7 @@ class Event {
 			$eventProcessed = #$parser->doBlockLevels(
 					$parser->parse(
 						Event::renderEvents(array($parsedEvent), false, false),
-						$parser->getTitle(), new ParserOptions(), false, false, 0 )->getText();
+						$parser->getTitle(), ParserOptions::newFromAnon(), false, false, 0 )->getRawText();
 			
 			$timelineEvent["text"] = $eventProcessed;
 			$timelineEvent["tag"] = Event::filterKnowledgeCategories($parsedEvent->categories);
@@ -189,12 +193,12 @@ class Event {
 				true
 		) );
 		$categoryInfoApi->execute();
-		$categoryInfoData = & $categoryInfoApi->getResult()->getResultData();
+		$categoryInfoData = $categoryInfoApi->getResult()->getResultData();
 		
 		$filtered = array();
-		foreach($categoryInfoData["query"]["pages"] as $categoryPage) {
+		foreach($categoryInfoData["query"]["pages"] ?? [] as $categoryPage) {
 			if(is_array($categoryPage)) {
-				foreach($categoryPage["categories"] as $category) {
+				foreach($categoryPage["categories"] ?? [] as $category) {
 					if(is_array($category)) {
 						$superCategory = explode(":", $category["title"])[1];
 						if(wfMessage("knowledgeCategory")->text() === $superCategory) {
@@ -239,7 +243,7 @@ class Event {
 	 */
 	public function getExternalLink($parser) {
 #		$title = Title::newFromText($this->pageTitle);
-		return $parser->parse($this->getWikiLink(), $parser->getTitle(), new ParserOptions(), false, false, 0 )->getText();
+		return $parser->parse($this->getWikiLink(), $parser->getTitle(), ParserOptions::newFromAnon(), false, false, 0 )->getRawText();
 	}
 	
 	public function setWhen($when) {

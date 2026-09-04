@@ -1,5 +1,7 @@
 <?php 
 
+use MediaWiki\Request\FauxRequest;
+
 class InPageCalendar {
 
 	public static function fetchCalendar($eraQualifier) {
@@ -16,7 +18,7 @@ class InPageCalendar {
 				true
 		) );
 		$calendarContentApi->execute();
-		$calendarContentData = & $calendarContentApi->getResult()->getResultData();
+		$calendarContentData = $calendarContentApi->getResult()->getResultData();
 
 		foreach($calendarContentData["query"]["pages"] as $page) break;
 		$calendarPageMarkUp = $page["revisions"][0]["slots"]["main"]["content"];
