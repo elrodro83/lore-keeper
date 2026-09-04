@@ -159,7 +159,7 @@ class Timeline {
 				true
 		) );
 		$blContentApi->execute();
-		$blContentData = & $blContentApi->getResult()->getResultData();
+		$blContentData = $blContentApi->getResult()->getResultData();
 		return $blContentData["query"]["pages"];
 	}
 	
