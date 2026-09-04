@@ -1,4 +1,7 @@
 <?php
+
+use MediaWiki\Request\FauxRequest;
+
 class Event {
 	
 	private $pageTitle = "";
