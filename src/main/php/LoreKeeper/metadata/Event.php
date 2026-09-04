@@ -146,7 +146,7 @@ class Event {
 			$eventProcessed = #$parser->doBlockLevels(
 					$parser->parse(
 						Event::renderEvents(array($parsedEvent), false, false),
-						$parser->getTitle(), ParserOptions::newFromAnon(), false, false, 0 )->getText();
+						$parser->getTitle(), ParserOptions::newFromAnon(), false, false, 0 )->getRawText();
 			
 			$timelineEvent["text"] = $eventProcessed;
 			$timelineEvent["tag"] = Event::filterKnowledgeCategories($parsedEvent->categories);
