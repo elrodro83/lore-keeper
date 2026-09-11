@@ -1,7 +1,7 @@
 {
 	"name": "LoreKeeper",
 	"requires": {
-		"MediaWiki": ">= 1.46.0"
+		"MediaWiki": ">= 1.43.0"
 	},
 	"type": "parserhook",
 	"MessagesDirs": {
