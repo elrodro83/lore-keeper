@@ -1,5 +1,7 @@
 <?php
 
+use MediaWiki\Request\FauxRequest;
+
 class PageFetchUtils {
 
 	public static function fetchPagesByIds($pageids) {
