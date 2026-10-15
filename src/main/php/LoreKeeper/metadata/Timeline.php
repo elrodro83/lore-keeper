@@ -64,7 +64,7 @@ class Timeline {
 					$this->processBacklinkPage($parser, $parser->getTitle()->getBaseText(), $selfTitle, $selfContent);
 				}
 
-				$this->eras = ParserUtils::getEras($selfContent);
+				$this->eras = ParserUtils::getEras($parser, $selfContent);
 			}
 		}
 	 	

@@ -16,7 +16,7 @@ class PageFetchUtils {
 				true
 		) );
 		$blContentApi->execute();
-		$blContentData = & $blContentApi->getResult()->getResultData();
+		$blContentData = $blContentApi->getResult()->getResultData();
 		return $blContentData["query"]["pages"];
 	}
 	
@@ -32,7 +32,7 @@ class PageFetchUtils {
 				true
 		) );
 		$backlinksApi->execute();
-		$backlinksData = & $backlinksApi->getResult()->getResultData();
+		$backlinksData = $backlinksApi->getResult()->getResultData();
 	
 		$pageids = [];
 		foreach($backlinksData["query"]["backlinks"] as $backlink) {

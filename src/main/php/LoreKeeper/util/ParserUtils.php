@@ -26,7 +26,7 @@ class ParserUtils {
 		return $imgs;
 	}
 
-	public static function getEras($pageMarkup) {
+	public static function getEras($parser, $pageMarkup) {
 		$rawEras = array();
 		
 		preg_match_all("/{{#era:([^}}]*)}}([^{]*)/", $pageMarkup, $rawEras);
@@ -39,7 +39,11 @@ class ParserUtils {
 			$parsedEra = new Era(array_merge([$parser],
 			preg_split("/\|(?=name|from|to)/",
 					str_replace(array("\r\n", "\n", "\r"), "", $rawEra))));
-			$parsedEra->setThumb(ParserUtils::getFiles($eraBody)[0]);
+			
+			$files = ParserUtils::getFiles($eraBody);
+			if(is_array($files)) {
+			    $parsedEra->setThumb($files[0]);
+			}
 			
 			array_push($parsedEras, $parsedEra);
 		}

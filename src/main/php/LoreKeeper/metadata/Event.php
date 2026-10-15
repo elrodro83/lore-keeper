@@ -224,7 +224,7 @@ class Event {
 	            if(is_array($linkedPage)) {
 	                $linkedPageContent = $linkedPage["revisions"][0]["slots"]["main"]["content"];
 	                
-		            $outgoingEras = ParserUtils::getEras($linkedPageContent);
+	                $outgoingEras = ParserUtils::getEras($parser, $linkedPageContent);
 		            if(empty($outgoingEras)) {
 	    	            $files = array_merge($files, ParserUtils::getFiles($linkedPageContent));
 	        	    } else {
