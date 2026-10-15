@@ -42,7 +42,7 @@ class ParserUtils {
 			
 			$files = ParserUtils::getFiles($eraBody);
 			if(is_array($files)) {
-			    $parsedEra->setThumb($files[0]);
+			    $parsedEra->setThumb($files[0] ?? null);
 			}
 			
 			array_push($parsedEras, $parsedEra);
