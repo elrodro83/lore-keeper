@@ -162,11 +162,12 @@ class Event {
 						Event::renderEvents(array($parsedEvent), false, false),
 						$parser->getTitle(), ParserOptions::newFromAnon(), false, false, 0 )->getRawText();
 			
-			$eventProcessed = $parser->doBlockLevels(
-					$parser->replaceInternalLinks(
+			$eventProcessed = #$parser->doBlockLevels(
+					#$parser->replaceInternalLinks(
 							$parser->recursiveTagParse(Event::renderEvents(array($parsedEvent), false, false)) . "\r\n" . $parsedEvent->getBody()
-						)
-				, false);
+					#	)
+				#, false)
+			;
 			$parser->replaceLinkHolders($eventProcessed);
 			
 			$timelineEvent["text"] = $eventProcessed;
